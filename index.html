@@ -342,6 +342,7 @@ nav{
   color:var(--accent);padding:.5rem 0;margin-bottom:.5rem;
   border-bottom:1px solid var(--border);
 }
+#words-container{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .words-table{width:100%;border-collapse:collapse}
 .words-table th{
   text-align:left;font-size:.75rem;text-transform:uppercase;
@@ -513,7 +514,7 @@ details.uitleg-collapsible[open] .uitleg-caret{transform:rotate(180deg)}
 .tifi-box .tifi{font-size:2.5rem;color:var(--cta);display:block;margin-bottom:.5rem}
 .tifi-box small{color:var(--muted);font-size:.8rem}
 
-.uitleg-table{width:100%;border-collapse:collapse;margin:1rem 0}
+.uitleg-table{width:max-content;min-width:100%;border-collapse:collapse;margin:1rem 0;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .uitleg-table th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.5rem .75rem;border-bottom:1px solid var(--border)}
 .uitleg-table td{padding:.6rem .75rem;border-bottom:1px solid rgba(var(--on-rgb),0.05);font-size:.9rem;color:var(--muted)}
 .uitleg-table td:first-child{color:var(--highlight)}
@@ -625,6 +626,7 @@ footer{
   padding:.25rem .65rem;border-radius:20px;cursor:default;
 }
 .version-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cta);flex-shrink:0}
+.version-note{font-size:.62rem;color:var(--muted);opacity:.6;margin-top:.25rem}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:900px){
@@ -636,9 +638,14 @@ footer{
   .voor-wie{grid-template-columns:1fr}
 }
 @media(max-width:600px){
-  nav{padding:0 1rem;gap:.5rem}
+  nav{padding:0 .75rem;gap:.4rem}
   .nav-logo{font-size:1rem}
-  .nav-btn{font-size:.78rem;padding:.35rem .6rem}
+  .nav-btn{font-size:.76rem;padding:.35rem .55rem}
+  .nav-links{max-width:calc(100vw - 190px);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .util-btn{padding:.35rem .5rem;font-size:0}
+  .util-btn svg{width:14px;height:14px}
+  #langBtnLabel{font-size:.72rem}
   .container{padding:0 1rem}
   .abc-showcase{grid-template-columns:repeat(5,1fr)}
   .abc-grid{grid-template-columns:repeat(5,1fr)}
@@ -930,7 +937,20 @@ footer{
 
 @media(max-width:700px){
   .ai-sidebar{display:none}
-  .ai-sidebar.mobile-open{display:flex;position:fixed;top:60px;left:0;bottom:0;z-index:200}
+  .ai-sidebar.mobile-open{display:flex;position:fixed;top:60px;left:0;bottom:0;z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.4)}
+  .ai-sidebar-toggle{display:flex}
+  .ai-sidebar-backdrop.open{display:block}
+}
+.ai-sidebar-toggle{
+  display:none;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:8px;flex-shrink:0;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  cursor:pointer;transition:all .2s;margin-right:.5rem;
+}
+.ai-sidebar-toggle:hover{color:var(--fg);border-color:var(--accent)}
+.ai-sidebar-backdrop{
+  display:none;position:fixed;top:60px;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.5);z-index:199;
 }
 
 /* ===== FEEDBACK MODAL ===== */
@@ -1560,8 +1580,12 @@ textarea.fb-input{resize:vertical;min-height:80px}
   <!-- MAIN -->
   <div class="ai-main">
     <div class="ai-chat-header">
+      <button class="ai-sidebar-toggle" onclick="aiToggleSidebar()" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
       <span class="ai-chat-title-display" id="aiChatTitleDisplay">AI Coach</span>
     </div>
+    <div class="ai-sidebar-backdrop" id="aiSidebarBackdrop" onclick="aiToggleSidebar()"></div>
 
     <!-- Welcome screen verwijderd — zit nu in de chat -->
 
@@ -1651,7 +1675,9 @@ textarea.fb-input{resize:vertical;min-height:80px}
         <h3>Tifinaghhub</h3>
         <p class="lang-nl">Een leerplatform voor Tarifit — de taal van het Rif-gebergte.</p>
         <p class="lang-en">A learning platform for Tarifit — the language of the Rif mountains.</p>
-        <div class="version-badge">v1.0</div>
+        <div class="version-badge">v1.1</div>
+        <div class="version-note lang-nl">Telefoonversie aangepast</div>
+        <div class="version-note lang-en">Phone version updated</div>
       </div>
       <div class="footer-right" style="display:flex;align-items:center;gap:1.25rem">
         <button class="btn btn-outline lang-nl" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="goPage('contact')">Hulp &amp; Contact</button>
@@ -2330,6 +2356,19 @@ function aiCancelProject() {
   if (wrap) wrap.remove();
 }
 
+function aiToggleSidebar() {
+  const sb = document.querySelector('.ai-sidebar');
+  const bd = document.getElementById('aiSidebarBackdrop');
+  const open = sb.classList.toggle('mobile-open');
+  if (bd) bd.classList.toggle('open', open);
+}
+function aiCloseSidebarMobile() {
+  const sb = document.querySelector('.ai-sidebar');
+  const bd = document.getElementById('aiSidebarBackdrop');
+  sb.classList.remove('mobile-open');
+  if (bd) bd.classList.remove('open');
+}
+
 function aiNewChat() {
   aiCurrentId = null;
   aiContext = null;
@@ -2342,6 +2381,7 @@ function aiNewChat() {
   document.querySelectorAll('.ai-chat-item').forEach(el => el.classList.remove('active'));
   aiRenderSidebar();
   aiShowWelcome();
+  aiCloseSidebarMobile();
 }
 
 function aiLoadChat(id) {
@@ -2360,6 +2400,7 @@ function aiLoadChat(id) {
   document.getElementById('aiBottomBar').style.display = 'block';
   setTimeout(() => document.getElementById('aiInput').focus(), 50);
   aiRenderSidebar(); aiRenderProjects();
+  aiCloseSidebarMobile();
 }
 
 function aiDeleteChat(e, id) { e.stopPropagation(); aiChats=aiChats.filter(c=>c.id!==id); aiSave(); if(aiCurrentId===id)aiNewChat(); aiRenderSidebar(); aiRenderProjects(); }
