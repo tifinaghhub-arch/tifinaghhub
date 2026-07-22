@@ -671,6 +671,15 @@ footer{
   top:0;left:0;right:0;bottom:0;
 }
 #page-ai.active{display:flex;flex-direction:row}
+#aiLocked{width:100%;height:100%;align-items:center;justify-content:center}
+#aiLocked.show{display:flex}
+
+/* ===== LOCKED GATE (algemeen: AI Coach & Oefenen) ===== */
+.locked-gate{padding:3rem 1.5rem;text-align:center}
+.locked-box{max-width:380px;margin:0 auto}
+.locked-icon{font-size:2.75rem;margin-bottom:1rem}
+.locked-box h2{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--fg);margin-bottom:.6rem}
+.locked-box p{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem;line-height:1.6}
 
 /* SIDEBAR */
 .ai-sidebar{
@@ -1131,6 +1140,8 @@ textarea.fb-input{resize:vertical;min-height:80px}
         <span class="lang-nl">Nog geen account?</span><span class="lang-en">No account yet?</span>
         <button onclick="authShowSignup()"><span class="lang-nl">Registreren</span><span class="lang-en">Sign up</span></button>
       </div>
+      <button class="auth-link lang-nl" onclick="authPreviewBypass()" style="margin-top:.75rem;opacity:.6">Site bekijken zonder in te loggen (preview)</button>
+      <button class="auth-link lang-en" onclick="authPreviewBypass()" style="margin-top:.75rem;opacity:.6">View site without logging in (preview)</button>
     </div>
 
     <!-- SIGNUP -->
@@ -1423,20 +1434,44 @@ function accountChangePassword() {
     });
 }
 
+function isRealLoggedIn() {
+  return !!(typeof fbAuth !== 'undefined' && fbAuth.currentUser && fbAuth.currentUser.emailVerified);
+}
+
+function authRequireLogin() {
+  try { sessionStorage.removeItem('tfh-preview'); } catch(e) {}
+  document.getElementById('authGate').classList.remove('hidden');
+  authShowLogin();
+}
+
+function authPreviewBypass() {
+  try { sessionStorage.setItem('tfh-preview', '1'); } catch(e) {}
+  document.getElementById('authGate').classList.add('hidden');
+}
+
 // Centrale login-status check: toont de auth-gate of de site
 fbAuth.onAuthStateChanged(user => {
   const gate = document.getElementById('authGate');
+  let previewing = false;
+  try { previewing = sessionStorage.getItem('tfh-preview') === '1'; } catch(e) {}
   if (!user) {
+    if (previewing) { gate.classList.add('hidden'); return; }
     gate.classList.remove('hidden');
     authShowLogin();
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
   } else if (!user.emailVerified) {
+    if (previewing) { gate.classList.add('hidden'); return; }
     gate.classList.remove('hidden');
     authShowVerify(user.email);
   } else {
     gate.classList.add('hidden');
     if (typeof aiAccountLoadProfile === 'function') aiAccountLoadProfile();
+    const activePage = document.querySelector('.page.active');
+    if (activePage && typeof goPage === 'function') {
+      const pid = activePage.id.replace('page-', '');
+      if (pid === 'oefenen' || pid === 'ai' || pid === 'woorden') goPage(pid);
+    }
   }
 });
 </script>
@@ -1618,7 +1653,18 @@ fbAuth.onAuthStateChanged(user => {
       <p class="lang-nl">Kies een modus en test je kennis van Tarifit-woorden.</p>
       <p class="lang-en">Choose a mode and test your knowledge of Tarifit words.</p>
     </div>
-    <div class="quiz-layout">
+    <div id="oefenenLocked" class="locked-gate" style="display:none">
+      <div class="locked-box">
+        <div class="locked-icon">🔒</div>
+        <h2 class="lang-nl">Log in om te oefenen</h2>
+        <h2 class="lang-en">Log in to practice</h2>
+        <p class="lang-nl">Maak een gratis account aan of log in om de oefeningen te gebruiken.</p>
+        <p class="lang-en">Create a free account or log in to use the exercises.</p>
+        <button class="auth-btn-primary lang-nl" style="max-width:260px" onclick="authRequireLogin()">Inloggen / registreren</button>
+        <button class="auth-btn-primary lang-en" style="max-width:260px" onclick="authRequireLogin()">Log in / sign up</button>
+      </div>
+    </div>
+    <div class="quiz-layout" id="oefenenContent">
 
       <div class="quiz-toolbar">
         <div class="quiz-modes">
@@ -1979,6 +2025,18 @@ fbAuth.onAuthStateChanged(user => {
 
 <!-- ===== PAGE: AI COACH ===== -->
 <div id="page-ai" class="page">
+  <div id="aiLocked" class="locked-gate" style="display:none">
+    <div class="locked-box">
+      <div class="locked-icon">🔒</div>
+      <h2 class="lang-nl">Log in om de AI Coach te gebruiken</h2>
+      <h2 class="lang-en">Log in to use the AI Coach</h2>
+      <p class="lang-nl">Maak een gratis account aan of log in om vragen te stellen over Tarifit.</p>
+      <p class="lang-en">Create a free account or log in to ask questions about Tarifit.</p>
+      <button class="auth-btn-primary lang-nl" style="max-width:260px" onclick="authRequireLogin()">Inloggen / registreren</button>
+      <button class="auth-btn-primary lang-en" style="max-width:260px" onclick="authRequireLogin()">Log in / sign up</button>
+    </div>
+  </div>
+  <div id="aiContent" style="display:flex;width:100%;height:100%">
 
   <!-- SIDEBAR -->
   <div class="ai-sidebar" id="aiSidebar">
@@ -2039,6 +2097,7 @@ fbAuth.onAuthStateChanged(user => {
         <button class="ai-send" id="aiSendBtn" onclick="aiSend()">&#10148;</button>
       </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -2402,13 +2461,33 @@ function goPage(id) {
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
     document.getElementById('siteFooter').style.display = 'none';
-    if (!document.getElementById('aiWelcomeBlock') && !aiCurrentId) {
-      aiNewChat();
+    const aiLocked = document.getElementById('aiLocked');
+    const aiContent = document.getElementById('aiContent');
+    if (isRealLoggedIn()) {
+      aiLocked.classList.remove('show'); aiLocked.style.display = 'none';
+      aiContent.style.display = 'flex';
+      if (!document.getElementById('aiWelcomeBlock') && !aiCurrentId) {
+        aiNewChat();
+      }
+    } else {
+      aiContent.style.display = 'none';
+      aiLocked.style.display = 'flex';
     }
   } else {
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
     document.getElementById('siteFooter').style.display = '';
+  }
+  if (id === 'oefenen') {
+    const oefLocked = document.getElementById('oefenenLocked');
+    const oefContent = document.getElementById('oefenenContent');
+    if (isRealLoggedIn()) {
+      oefLocked.style.display = 'none';
+      oefContent.style.display = 'block';
+    } else {
+      oefContent.style.display = 'none';
+      oefLocked.style.display = 'block';
+    }
   }
   if (id === 'account' && typeof aiAccountLoadProfile === 'function') {
     aiAccountLoadProfile();
@@ -2423,6 +2502,7 @@ function goPage(id) {
     setTimeout(() => {
       const container = document.getElementById('words-container');
       if (container && container.children.length === 0) buildW();
+      else if (container && allWords.length) filterW();
     }, 50);
   }
   window.scrollTo(0, 0);
@@ -2558,11 +2638,26 @@ function renderW(data) {
     container.innerHTML = '<div class="no-results">' + (lang === 'en' ? 'No words found.' : 'Geen woorden gevonden.') + '</div>';
     return;
   }
+  const locked = !isRealLoggedIn();
+  const shown = locked ? data.slice(0, 3) : data;
   let html = '<table class="words-table"><thead><tr><th>' + (lang === 'en' ? 'English' : 'Nederlands') + '</th><th>Tamazight</th><th>Tifinagh</th></tr></thead><tbody>';
-  data.forEach(w => {
+  shown.forEach(w => {
     html += '<tr><td>' + esc(lang === 'en' ? w.en : w.nl) + '</td><td>' + esc(w.tam) + '</td><td class="tifi">' + esc(w.tifi) + '</td></tr>';
   });
   html += '</tbody></table>';
+  if (locked && data.length > 3) {
+    html += '<div class="locked-gate" style="padding:2rem 1.5rem">' +
+      '<div class="locked-box">' +
+        '<div class="locked-icon">🔒</div>' +
+        '<h2 class="lang-nl">Nog ' + (data.length - 3) + ' woorden te ontdekken</h2>' +
+        '<h2 class="lang-en">' + (data.length - 3) + ' more words to discover</h2>' +
+        '<p class="lang-nl">Log in of maak een gratis account aan om de volledige woordenlijst te zien.</p>' +
+        '<p class="lang-en">Log in or create a free account to see the full word list.</p>' +
+        '<button class="auth-btn-primary lang-nl" style="max-width:260px" onclick="authRequireLogin()">Inloggen / registreren</button>' +
+        '<button class="auth-btn-primary lang-en" style="max-width:260px" onclick="authRequireLogin()">Log in / sign up</button>' +
+      '</div>' +
+    '</div>';
+  }
   container.innerHTML = html;
 }
 
