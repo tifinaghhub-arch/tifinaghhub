@@ -2442,7 +2442,7 @@ const WORDS = [
 <script>
 /* ===== NAVIGATION ===== */
 function goPage(id) {
-  try { localStorage.setItem('tfh-lastpage', id); } catch(e) {}
+  try { sessionStorage.setItem('tfh-lastpage', id); } catch(e) {}
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
@@ -3521,10 +3521,11 @@ setTimeout(() => {
   if (activeBtn) moveIndicator(activeBtn);
 }, 0);
 
-// Herstel de laatst bezochte pagina na een refresh, i.p.v. altijd terug naar Thuis
+// Herstel de laatst bezochte pagina na een refresh (binnen hetzelfde tabblad),
+// maar begin bij een nieuw bezoek (nieuw tabblad/na sluiten) gewoon weer bij Thuis
 (function restoreLastPage() {
   let lastPage = null;
-  try { lastPage = localStorage.getItem('tfh-lastpage'); } catch(e) {}
+  try { lastPage = sessionStorage.getItem('tfh-lastpage'); } catch(e) {}
   if (lastPage && lastPage !== 'thuis' && document.getElementById('page-' + lastPage)) {
     goPage(lastPage);
   }
