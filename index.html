@@ -254,6 +254,7 @@ nav{
 .abc-layout{display:grid;grid-template-columns:1fr 340px;gap:2rem;padding:2rem 0;align-items:start}
 .abc-grid{
   display:grid;grid-template-columns:repeat(7,1fr);gap:.6rem;
+  animation:contentIn .35s ease both;
 }
 .abc-card{
   aspect-ratio:1;display:flex;flex-direction:column;
@@ -263,7 +264,7 @@ nav{
   transition:border-color .2s,background .2s;
   padding:.4rem;
 }
-.abc-card:hover{border-color:rgba(var(--cta-rgb),0.4);background:var(--card-hover)}
+.abc-card:hover{border-color:rgba(var(--cta-rgb),0.4);background:var(--card-hover);transform:translateY(-2px)}
 .abc-card.sel{border-color:var(--cta);background:var(--card-hover);box-shadow:0 0 0 1px var(--cta)}
 .abc-card .tifi{font-size:1.6rem;color:var(--highlight)}
 .abc-card .lat{font-size:.65rem;color:var(--muted);margin-top:.15rem;font-weight:500}
@@ -343,7 +344,8 @@ nav{
   border-bottom:1px solid var(--border);
 }
 #words-container{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.words-table{width:100%;border-collapse:collapse}
+.words-table{width:100%;border-collapse:collapse;animation:contentIn .35s ease both}
+@keyframes contentIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .words-table th{
   text-align:left;font-size:.75rem;text-transform:uppercase;
   letter-spacing:.08em;color:var(--muted);
@@ -562,6 +564,12 @@ details.uitleg-collapsible[open] .uitleg-caret{transform:rotate(180deg)}
 .sources-box li{font-size:.82rem;color:var(--muted);line-height:1.5}
 .sources-box a{color:var(--highlight);text-decoration:underline;text-underline-offset:2px}
 .sources-box a:hover{color:var(--cta)}
+
+.contact-form-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.75rem;box-shadow:var(--shadow-sm);
+}
+.contact-form-card h2{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--highlight);margin-bottom:1.1rem}
 
 .history-photo{
   margin:0 0 1.75rem;border-radius:var(--radius);overflow:hidden;
@@ -953,6 +961,57 @@ footer{
   background:rgba(0,0,0,0.5);z-index:199;
 }
 
+/* ===== AUTH GATE ===== */
+#authGate{
+  position:fixed;inset:0;z-index:1000;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem 1rem;overflow-y:auto;
+}
+#authGate.hidden{display:none}
+.auth-box{
+  width:100%;max-width:420px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:calc(var(--radius) + 4px);padding:2.25rem 2rem;
+  box-shadow:var(--shadow-md);
+}
+.auth-logo{
+  display:flex;align-items:center;gap:.5rem;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;
+  color:var(--highlight);margin-bottom:1.5rem;
+}
+.auth-logo .tifi{color:var(--cta);font-size:1.5rem}
+.auth-box h2{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--fg);text-align:center;margin-bottom:.4rem}
+.auth-sub{color:var(--muted);font-size:.85rem;text-align:center;margin-bottom:1.4rem;line-height:1.6}
+.auth-error{
+  background:rgba(235,87,87,0.12);border:1px solid rgba(235,87,87,0.3);color:var(--bad);
+  padding:.6rem .9rem;border-radius:var(--radius);font-size:.82rem;margin-bottom:1rem;
+}
+.auth-btn-primary{
+  width:100%;background:var(--cta);color:var(--cta-ink);border:none;
+  padding:.75rem 1rem;border-radius:var(--radius);font-size:.95rem;font-weight:700;
+  cursor:pointer;transition:all .2s;margin-top:.5rem;box-shadow:var(--shadow-sm);
+}
+.auth-btn-primary:hover{background:var(--cta-hover)}
+.auth-btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.auth-link{
+  display:block;width:100%;text-align:center;background:none;border:none;
+  color:var(--muted);font-size:.82rem;padding:.7rem 0 0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;
+}
+.auth-link:hover{color:var(--cta)}
+.auth-switch{
+  text-align:center;margin-top:1.3rem;padding-top:1.1rem;border-top:1px solid var(--border);
+  font-size:.85rem;color:var(--muted);
+}
+.auth-switch button{background:none;border:none;color:var(--cta);font-weight:700;cursor:pointer;margin-left:.35rem;font-size:.85rem}
+.auth-switch button:hover{text-decoration:underline}
+.auth-checkbox{
+  display:flex;align-items:flex-start;gap:.5rem;margin:1rem 0 .25rem;
+  font-size:.8rem;color:var(--muted);line-height:1.5;cursor:pointer;
+}
+.auth-checkbox input{margin-top:.2rem;accent-color:var(--cta);flex-shrink:0}
+.auth-terms-link{background:none;border:none;color:var(--cta);text-decoration:underline;cursor:pointer;font-size:.8rem;padding:0}
+
 /* ===== FEEDBACK MODAL ===== */
 .feedback-overlay{
   display:none;position:fixed;inset:0;z-index:500;
@@ -1000,12 +1059,361 @@ textarea.fb-input{resize:vertical;min-height:80px}
   text-align:center;padding:1rem 0;
   color:var(--highlight);font-size:1rem;
 }
+.fb-icon{font-size:2.5rem;margin-bottom:.5rem;text-align:center}
 .fb-success .fb-icon{font-size:2.5rem;margin-bottom:.5rem}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>emailjs.init('YOUR_PUBLIC_KEY');</script>
+
+<!-- ===== FIREBASE (account/login) ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-lNwvMCkJzOmOcAzoYU-X7cs3ZEWDQwo",
+    authDomain: "tifinaghhub-dd4b2.firebaseapp.com",
+    projectId: "tifinaghhub-dd4b2",
+    storageBucket: "tifinaghhub-dd4b2.firebasestorage.app",
+    messagingSenderId: "495412695861",
+    appId: "1:495412695861:web:aa0bd58f08a4a63a34327c"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const fbAuth = firebase.auth();
+  const fbDb = firebase.firestore();
+  fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+</script>
 </head>
 <body>
+
+<!-- ===== AUTH GATE ===== -->
+<div id="authGate">
+  <div class="auth-box">
+    <div class="auth-logo"><span class="tifi">ⵣ</span> Tifinaghhub</div>
+
+    <!-- LOGIN -->
+    <div id="authLogin">
+      <h2 class="lang-nl">Welkom terug</h2>
+      <h2 class="lang-en">Welcome back</h2>
+      <p class="auth-sub lang-nl">Log in om verder te gaan met leren.</p>
+      <p class="auth-sub lang-en">Log in to continue learning.</p>
+      <div id="authLoginError" class="auth-error" style="display:none"></div>
+      <label class="fb-label lang-nl">E-mail</label>
+      <label class="fb-label lang-en">Email</label>
+      <input class="fb-input" id="loginEmail" type="email" placeholder="naam@voorbeeld.com" autocomplete="username">
+      <label class="fb-label lang-nl">Wachtwoord</label>
+      <label class="fb-label lang-en">Password</label>
+      <input class="fb-input" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+      <button class="auth-btn-primary lang-nl" onclick="authLogin()">Inloggen</button>
+      <button class="auth-btn-primary lang-en" onclick="authLogin()">Log in</button>
+      <button class="auth-link lang-nl" onclick="authForgotPassword()">Wachtwoord vergeten?</button>
+      <button class="auth-link lang-en" onclick="authForgotPassword()">Forgot password?</button>
+      <div class="auth-switch">
+        <span class="lang-nl">Nog geen account?</span><span class="lang-en">No account yet?</span>
+        <button onclick="authShowSignup()"><span class="lang-nl">Registreren</span><span class="lang-en">Sign up</span></button>
+      </div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="authSignup" style="display:none">
+      <h2 class="lang-nl">Account aanmaken</h2>
+      <h2 class="lang-en">Create an account</h2>
+      <p class="auth-sub lang-nl">Gratis, en je hoeft het maar één keer te doen.</p>
+      <p class="auth-sub lang-en">Free, and you only have to do it once.</p>
+      <div id="authSignupError" class="auth-error" style="display:none"></div>
+      <div style="display:flex;gap:.75rem">
+        <div style="flex:1">
+          <label class="fb-label lang-nl">Voornaam</label>
+          <label class="fb-label lang-en">First name</label>
+          <input class="fb-input" id="suFirstName" type="text">
+        </div>
+        <div style="flex:1">
+          <label class="fb-label lang-nl">Achternaam</label>
+          <label class="fb-label lang-en">Last name</label>
+          <input class="fb-input" id="suLastName" type="text">
+        </div>
+      </div>
+      <label class="fb-label lang-nl">E-mail</label>
+      <label class="fb-label lang-en">Email</label>
+      <input class="fb-input" id="suEmail" type="email" placeholder="naam@voorbeeld.com" autocomplete="username">
+      <label class="fb-label lang-nl">Geboortedatum</label>
+      <label class="fb-label lang-en">Date of birth</label>
+      <input class="fb-input" id="suBirthdate" type="date">
+      <label class="fb-label lang-nl">Wachtwoord</label>
+      <label class="fb-label lang-en">Password</label>
+      <input class="fb-input" id="suPassword" type="password" placeholder="Minimaal 6 tekens" autocomplete="new-password">
+      <label class="auth-checkbox">
+        <input type="checkbox" id="suTerms">
+        <span class="lang-nl">Ik ga akkoord met de <button type="button" class="auth-terms-link" onclick="authShowTerms()">gebruiksvoorwaarden</button></span>
+        <span class="lang-en">I agree to the <button type="button" class="auth-terms-link" onclick="authShowTerms()">terms of use</button></span>
+      </label>
+      <button class="auth-btn-primary lang-nl" onclick="authSignup()">Account aanmaken</button>
+      <button class="auth-btn-primary lang-en" onclick="authSignup()">Create account</button>
+      <div class="auth-switch">
+        <span class="lang-nl">Heb je al een account?</span><span class="lang-en">Already have an account?</span>
+        <button onclick="authShowLogin()"><span class="lang-nl">Inloggen</span><span class="lang-en">Log in</span></button>
+      </div>
+    </div>
+
+    <!-- VERIFY EMAIL NOTICE -->
+    <div id="authVerify" style="display:none;text-align:center">
+      <div class="fb-icon" style="margin:0 auto 1rem">✉️</div>
+      <h2 class="lang-nl">Bevestig je e-mailadres</h2>
+      <h2 class="lang-en">Confirm your email</h2>
+      <p class="auth-sub lang-nl">We hebben een bevestigingslink gestuurd naar <strong id="authVerifyEmail"></strong>. Klik op de link in die mail, en ververs dan deze pagina.</p>
+      <p class="auth-sub lang-en">We've sent a confirmation link to <strong id="authVerifyEmailEn"></strong>. Click the link in that email, then refresh this page.</p>
+      <button class="auth-btn-primary lang-nl" onclick="authCheckVerified()">Ik heb bevestigd, ga verder</button>
+      <button class="auth-btn-primary lang-en" onclick="authCheckVerified()">I've confirmed, continue</button>
+      <button class="auth-link lang-nl" onclick="authResendVerification()">Mail opnieuw versturen</button>
+      <button class="auth-link lang-en" onclick="authResendVerification()">Resend email</button>
+      <button class="auth-link lang-nl" onclick="authLogout()">Uitloggen</button>
+      <button class="auth-link lang-en" onclick="authLogout()">Log out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TERMS MODAL ===== -->
+<div id="termsOverlay" class="feedback-overlay">
+  <div class="feedback-modal" style="max-width:520px;max-height:80vh;overflow-y:auto">
+    <h3 class="lang-nl">Gebruiksvoorwaarden</h3>
+    <h3 class="lang-en">Terms of use</h3>
+    <div class="lang-nl" style="color:var(--muted);font-size:.88rem;line-height:1.7">
+      <p>Door een account aan te maken op Tifinaghhub ga je akkoord met het volgende:</p>
+      <p>1. Je gebruikt de site voor persoonlijke, educatieve doeleinden.</p>
+      <p>2. Je gegevens (naam, e-mail, geboortedatum) worden uitsluitend gebruikt om je account te beheren en worden niet gedeeld met derden.</p>
+      <p>3. Je bent zelf verantwoordelijk voor het geheimhouden van je wachtwoord.</p>
+      <p>4. Tifinaghhub kan de dienst op elk moment aanpassen of stoppen.</p>
+    </div>
+    <div class="lang-en" style="color:var(--muted);font-size:.88rem;line-height:1.7">
+      <p>By creating an account on Tifinaghhub, you agree to the following:</p>
+      <p>1. You use the site for personal, educational purposes.</p>
+      <p>2. Your data (name, email, date of birth) is used solely to manage your account and is not shared with third parties.</p>
+      <p>3. You are responsible for keeping your password confidential.</p>
+      <p>4. Tifinaghhub may modify or discontinue the service at any time.</p>
+    </div>
+    <div class="fb-row">
+      <button class="fb-submit lang-nl" onclick="closeTerms()">Sluiten</button>
+      <button class="fb-submit lang-en" onclick="closeTerms()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== AUTH LOGICA ===== */
+function authShowLogin() {
+  document.getElementById('authSignup').style.display = 'none';
+  document.getElementById('authVerify').style.display = 'none';
+  document.getElementById('authLogin').style.display = 'block';
+}
+function authShowSignup() {
+  document.getElementById('authLogin').style.display = 'none';
+  document.getElementById('authVerify').style.display = 'none';
+  document.getElementById('authSignup').style.display = 'block';
+}
+function authShowVerify(email) {
+  document.getElementById('authLogin').style.display = 'none';
+  document.getElementById('authSignup').style.display = 'none';
+  document.getElementById('authVerify').style.display = 'block';
+  document.getElementById('authVerifyEmail').textContent = email;
+  document.getElementById('authVerifyEmailEn').textContent = email;
+}
+function authShowTerms() { document.getElementById('termsOverlay').classList.add('open'); }
+function closeTerms() { document.getElementById('termsOverlay').classList.remove('open'); }
+
+function authErr(el, msg) { const e = document.getElementById(el); e.textContent = msg; e.style.display = 'block'; }
+function authErrClear(el) { document.getElementById(el).style.display = 'none'; }
+
+function authFriendlyError(code, lang) {
+  const map = {
+    'auth/email-already-in-use': lang==='en' ? 'This email is already in use.' : 'Dit e-mailadres is al in gebruik.',
+    'auth/invalid-email': lang==='en' ? 'Invalid email address.' : 'Ongeldig e-mailadres.',
+    'auth/weak-password': lang==='en' ? 'Password must be at least 6 characters.' : 'Wachtwoord moet minimaal 6 tekens zijn.',
+    'auth/user-not-found': lang==='en' ? 'No account found with this email.' : 'Geen account gevonden met dit e-mailadres.',
+    'auth/wrong-password': lang==='en' ? 'Incorrect password.' : 'Onjuist wachtwoord.',
+    'auth/invalid-credential': lang==='en' ? 'Incorrect email or password.' : 'Onjuiste combinatie van e-mail en wachtwoord.',
+    'auth/too-many-requests': lang==='en' ? 'Too many attempts. Please try again later.' : 'Te veel pogingen. Probeer het later opnieuw.',
+  };
+  return map[code] || (lang==='en' ? 'Something went wrong. Please try again.' : 'Er ging iets mis. Probeer het opnieuw.');
+}
+
+function authSignup() {
+  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  authErrClear('authSignupError');
+  const firstName = document.getElementById('suFirstName').value.trim();
+  const lastName  = document.getElementById('suLastName').value.trim();
+  const email     = document.getElementById('suEmail').value.trim();
+  const birthdate = document.getElementById('suBirthdate').value;
+  const password  = document.getElementById('suPassword').value;
+  const termsOk   = document.getElementById('suTerms').checked;
+
+  if (!firstName || !lastName) { authErr('authSignupError', lang==='en' ? 'Please fill in your first and last name.' : 'Vul je voor- en achternaam in.'); return; }
+  if (!email) { authErr('authSignupError', lang==='en' ? 'Please fill in your email.' : 'Vul je e-mailadres in.'); return; }
+  if (!password || password.length < 6) { authErr('authSignupError', lang==='en' ? 'Password must be at least 6 characters.' : 'Wachtwoord moet minimaal 6 tekens zijn.'); return; }
+  if (!termsOk) { authErr('authSignupError', lang==='en' ? 'You must accept the terms of use.' : 'Je moet akkoord gaan met de gebruiksvoorwaarden.'); return; }
+
+  fbAuth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      const uid = cred.user.uid;
+      return fbDb.collection('users').doc(uid).set({
+        firstName, lastName, email, birthdate: birthdate || null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => cred.user.updateProfile({ displayName: firstName + ' ' + lastName }))
+        .then(() => cred.user.sendEmailVerification())
+        .then(() => { authShowVerify(email); });
+    })
+    .catch(err => { authErr('authSignupError', authFriendlyError(err.code, lang)); });
+}
+
+function authLogin() {
+  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  authErrClear('authLoginError');
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { authErr('authLoginError', lang==='en' ? 'Please fill in both fields.' : 'Vul beide velden in.'); return; }
+
+  fbAuth.signInWithEmailAndPassword(email, password)
+    .catch(err => { authErr('authLoginError', authFriendlyError(err.code, lang)); });
+}
+
+function authForgotPassword() {
+  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) { authErr('authLoginError', lang==='en' ? 'Fill in your email above first, then click this link.' : 'Vul eerst je e-mail hierboven in, klik dan op deze link.'); return; }
+  fbAuth.sendPasswordResetEmail(email)
+    .then(() => { authErrClear('authLoginError'); alert(lang==='en' ? 'A password reset link has been sent to ' + email : 'Er is een link om je wachtwoord te resetten gestuurd naar ' + email); })
+    .catch(err => { authErr('authLoginError', authFriendlyError(err.code, lang)); });
+}
+
+function authCheckVerified() {
+  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const user = fbAuth.currentUser;
+  if (!user) return;
+  user.reload().then(() => {
+    if (user.emailVerified) {
+      location.reload();
+    } else {
+      alert(lang==='en' ? 'Not verified yet — check your inbox (and spam folder).' : 'Nog niet bevestigd — check je inbox (en spam-map).');
+    }
+  });
+}
+
+function authResendVerification() {
+  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const user = fbAuth.currentUser;
+  if (!user) return;
+  user.sendEmailVerification()
+    .then(() => alert(lang==='en' ? 'Email sent again!' : 'Mail opnieuw verstuurd!'))
+    .catch(() => alert(lang==='en' ? 'Could not resend right now, try again shortly.' : 'Kon niet opnieuw versturen, probeer zo weer.'));
+}
+
+function authLogout() {
+  fbAuth.signOut();
+}
+
+/* ===== ACCOUNT-PAGINA ===== */
+function aiAccountLoadProfile() {
+  const user = fbAuth.currentUser;
+  if (!user) return;
+  const emailEl = document.getElementById('acEmail');
+  if (emailEl) emailEl.value = user.email || '';
+  fbDb.collection('users').doc(user.uid).get().then(doc => {
+    if (doc.exists) {
+      const d = doc.data();
+      if (document.getElementById('acFirstName')) document.getElementById('acFirstName').value = d.firstName || '';
+      if (document.getElementById('acLastName')) document.getElementById('acLastName').value = d.lastName || '';
+      if (document.getElementById('acBirthdate')) document.getElementById('acBirthdate').value = d.birthdate || '';
+    }
+  });
+}
+
+function accountSaveProfile() {
+  const lang = curLang();
+  const user = fbAuth.currentUser;
+  if (!user) return;
+  document.getElementById('acProfileMsg').style.display = 'none';
+  document.getElementById('acProfileOk').style.display = 'none';
+  const firstName = document.getElementById('acFirstName').value.trim();
+  const lastName  = document.getElementById('acLastName').value.trim();
+  const birthdate = document.getElementById('acBirthdate').value;
+
+  if (!firstName || !lastName) {
+    const m = document.getElementById('acProfileMsg');
+    m.textContent = lang === 'en' ? 'Please fill in your first and last name.' : 'Vul je voor- en achternaam in.';
+    m.style.display = 'block';
+    return;
+  }
+
+  fbDb.collection('users').doc(user.uid).set({ firstName, lastName, birthdate: birthdate || null }, { merge: true })
+    .then(() => user.updateProfile({ displayName: firstName + ' ' + lastName }))
+    .then(() => {
+      const ok = document.getElementById('acProfileOk');
+      ok.textContent = lang === 'en' ? 'Saved!' : 'Opgeslagen!';
+      ok.style.display = 'block';
+    })
+    .catch(() => {
+      const m = document.getElementById('acProfileMsg');
+      m.textContent = lang === 'en' ? 'Something went wrong saving your details.' : 'Er ging iets mis bij het opslaan.';
+      m.style.display = 'block';
+    });
+}
+
+function accountChangePassword() {
+  const lang = curLang();
+  const user = fbAuth.currentUser;
+  if (!user) return;
+  document.getElementById('acPassMsg').style.display = 'none';
+  document.getElementById('acPassOk').style.display = 'none';
+  const current = document.getElementById('acCurrentPass').value;
+  const next = document.getElementById('acNewPass').value;
+
+  if (!current || !next) {
+    const m = document.getElementById('acPassMsg');
+    m.textContent = lang === 'en' ? 'Fill in both password fields.' : 'Vul beide wachtwoordvelden in.';
+    m.style.display = 'block';
+    return;
+  }
+  if (next.length < 6) {
+    const m = document.getElementById('acPassMsg');
+    m.textContent = lang === 'en' ? 'New password must be at least 6 characters.' : 'Nieuw wachtwoord moet minimaal 6 tekens zijn.';
+    m.style.display = 'block';
+    return;
+  }
+
+  const cred = firebase.auth.EmailAuthProvider.credential(user.email, current);
+  user.reauthenticateWithCredential(cred)
+    .then(() => user.updatePassword(next))
+    .then(() => {
+      document.getElementById('acCurrentPass').value = '';
+      document.getElementById('acNewPass').value = '';
+      const ok = document.getElementById('acPassOk');
+      ok.textContent = lang === 'en' ? 'Password changed!' : 'Wachtwoord gewijzigd!';
+      ok.style.display = 'block';
+    })
+    .catch(err => {
+      const m = document.getElementById('acPassMsg');
+      m.textContent = authFriendlyError(err.code, lang);
+      m.style.display = 'block';
+    });
+}
+
+// Centrale login-status check: toont de auth-gate of de site
+fbAuth.onAuthStateChanged(user => {
+  const gate = document.getElementById('authGate');
+  if (!user) {
+    gate.classList.remove('hidden');
+    authShowLogin();
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+  } else if (!user.emailVerified) {
+    gate.classList.remove('hidden');
+    authShowVerify(user.email);
+  } else {
+    gate.classList.add('hidden');
+    if (typeof aiAccountLoadProfile === 'function') aiAccountLoadProfile();
+  }
+});
+</script>
+
 
 <!-- ===== NAV ===== -->
 <nav>
@@ -1029,6 +1437,9 @@ textarea.fb-input{resize:vertical;min-height:80px}
     <button class="util-btn theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle dark/light theme" title="Toggle dark/light theme">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+    <button class="util-btn" id="accountBtn" onclick="goPage('account')" aria-label="Account" title="Account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
     </button>
   </div>
 </nav>
@@ -1604,6 +2015,67 @@ textarea.fb-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- ===== PAGE: ACCOUNT ===== -->
+<div id="page-account" class="page">
+  <div class="container">
+    <div class="page-header">
+      <div class="tag lang-nl">Jouw account</div>
+      <div class="tag lang-en">Your account</div>
+      <h1 class="lang-nl">Account</h1>
+      <h1 class="lang-en">Account</h1>
+      <p class="lang-nl">Beheer je gegevens en wachtwoord.</p>
+      <p class="lang-en">Manage your details and password.</p>
+    </div>
+    <div style="padding-top:1.5rem;max-width:520px">
+
+      <div class="contact-form-card" style="margin-bottom:1.5rem">
+        <h2 class="lang-nl">Mijn gegevens</h2>
+        <h2 class="lang-en">My details</h2>
+        <div id="acProfileMsg" class="auth-error" style="display:none"></div>
+        <div id="acProfileOk" class="quiz-feedback ok" style="display:none;margin-bottom:1rem"></div>
+        <div style="display:flex;gap:.75rem">
+          <div style="flex:1">
+            <label class="fb-label lang-nl">Voornaam</label>
+            <label class="fb-label lang-en">First name</label>
+            <input class="fb-input" id="acFirstName" type="text">
+          </div>
+          <div style="flex:1">
+            <label class="fb-label lang-nl">Achternaam</label>
+            <label class="fb-label lang-en">Last name</label>
+            <input class="fb-input" id="acLastName" type="text">
+          </div>
+        </div>
+        <label class="fb-label lang-nl">E-mail</label>
+        <label class="fb-label lang-en">Email</label>
+        <input class="fb-input" id="acEmail" type="email" disabled style="opacity:.6">
+        <label class="fb-label lang-nl">Geboortedatum</label>
+        <label class="fb-label lang-en">Date of birth</label>
+        <input class="fb-input" id="acBirthdate" type="date">
+        <button class="fb-submit lang-nl" style="margin-top:.5rem" onclick="accountSaveProfile()">Opslaan</button>
+        <button class="fb-submit lang-en" style="margin-top:.5rem" onclick="accountSaveProfile()">Save</button>
+      </div>
+
+      <div class="contact-form-card" style="margin-bottom:1.5rem">
+        <h2 class="lang-nl">Wachtwoord wijzigen</h2>
+        <h2 class="lang-en">Change password</h2>
+        <div id="acPassMsg" class="auth-error" style="display:none"></div>
+        <div id="acPassOk" class="quiz-feedback ok" style="display:none;margin-bottom:1rem"></div>
+        <label class="fb-label lang-nl">Huidig wachtwoord</label>
+        <label class="fb-label lang-en">Current password</label>
+        <input class="fb-input" id="acCurrentPass" type="password" autocomplete="current-password">
+        <label class="fb-label lang-nl">Nieuw wachtwoord</label>
+        <label class="fb-label lang-en">New password</label>
+        <input class="fb-input" id="acNewPass" type="password" autocomplete="new-password" placeholder="Minimaal 6 tekens">
+        <button class="fb-submit lang-nl" style="margin-top:.5rem" onclick="accountChangePassword()">Wachtwoord wijzigen</button>
+        <button class="fb-submit lang-en" style="margin-top:.5rem" onclick="accountChangePassword()">Change password</button>
+      </div>
+
+      <button class="btn btn-outline lang-nl" onclick="authLogout()">Uitloggen</button>
+      <button class="btn btn-outline lang-en" onclick="authLogout()">Log out</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== PAGE: HULP & CONTACT ===== -->
 <div id="page-contact" class="page">
   <div class="container">
@@ -1888,6 +2360,7 @@ const WORDS = [
 <script>
 /* ===== NAVIGATION ===== */
 function goPage(id) {
+  try { localStorage.setItem('tfh-lastpage', id); } catch(e) {}
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
@@ -1909,6 +2382,9 @@ function goPage(id) {
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
     document.getElementById('siteFooter').style.display = '';
+  }
+  if (id === 'account' && typeof aiAccountLoadProfile === 'function') {
+    aiAccountLoadProfile();
   }
   if (id === 'alfabet') {
     setTimeout(() => {
@@ -2556,6 +3032,34 @@ const KB = [
   { id:'hirak', keys:['hirak','mouhcine fikri','mohsine fikri','vismarkt protest'],
     nl:'De <strong>Hirak al-Rif</strong>-beweging (2016–2017) ontstond na de dood van visverkoper Mouhcine Fikri in Al Hoceima. De protesten eisten betere voorzieningen en meer investeringen in het Rif, en werden in de zomer van 2017 hardhandig onderdrukt. Meer op de Uitleg-pagina, bij "Geschiedenis".',
     en:'The <strong>Hirak al-Rif</strong> movement (2016–2017) emerged after the death of fish vendor Mouhcine Fikri in Al Hoceima. The protests demanded better services and investment in the Rif, and were forcefully suppressed in the summer of 2017. More on the Guide page, under "History".' },
+  { id:'republiek', keys:['republiek van de rif','republic of the rif','rif republiek'],
+    nl:'De <strong>Republiek van de Rif</strong> was een kortstondige onafhankelijke staat (1921–1926), uitgeroepen door Abd el-Krim na de overwinning bij Annual. Ajdir, bij Al Hoceima, was de hoofdstad — met een eigen grondwet, parlement en munteenheid. Ze viel in 1926 na een gezamenlijk Spaans-Frans offensief.',
+    en:'The <strong>Republic of the Rif</strong> was a short-lived independent state (1921–1926), declared by Abd el-Krim after the victory at Annual. Ajdir, near Al Hoceima, was its capital — with its own constitution, parliament, and currency. It fell in 1926 after a joint Spanish-French offensive.',
+    follow:[['Wie was Abd el-Krim?','Who was Abd el-Krim?'],['Wat was de Rif-oorlog?','What was the Rif War?']] },
+  { id:'nekor', keys:['koninkrijk nekor','kingdom of nekor','nekor'],
+    nl:'Het <strong>Koninkrijk Nekor</strong> werd rond 710 n.Chr. gesticht door Salih ibn Mansur en was een van de eerste islamitische staten in het Rif-gebergte. Vanaf toen verspreidde de islam zich onder de Berberbevolking van de regio.',
+    en:'The <strong>Kingdom of Nekor</strong> was founded around 710 CE by Salih ibn Mansur and was one of the earliest Islamic states in the Rif mountains. From then on, Islam spread among the region\'s Berber population.',
+    follow:[['Wie zijn de Rifijnen?','Who are the Riffians?']] },
+  { id:'rifijnen', keys:['wie zijn de rifijnen','who are the riffians','wie zijn de riffians'],
+    nl:'De <strong>Rifijnen</strong> zijn de Amazigh (Berber) bevolking van het Rif-gebergte in Noord-Marokko. Ze spreken Tarifit en staan bekend om hun lange geschiedenis van onafhankelijkheid — mede dankzij het ruige, bergachtige landschap dat veroveraars lange tijd op afstand hield.',
+    en:'The <strong>Riffians</strong> are the Amazigh (Berber) population of the Rif mountains in northern Morocco. They speak Tarifit and are known for a long history of independence — helped by the rugged, mountainous terrain that kept conquerors at bay for a long time.',
+    follow:[['Wat betekent Amazigh?','What does Amazigh mean?'],['Wie was Abd el-Krim?','Who was Abd el-Krim?']] },
+  { id:'chefchaouen', keys:['chefchaouen','blauwe stad'],
+    nl:'<strong>Chefchaouen</strong>, de bekende "blauwe stad" in het Rif-gebergte, werd in de 15e eeuw mede gesticht door Andalusiërs die na de val van het moslimbewind in Spanje naar Noord-Afrika vluchtten. Zij namen hun architectuur en muziek mee.',
+    en:'<strong>Chefchaouen</strong>, the well-known "blue city" in the Rif mountains, was partly founded in the 15th century by Andalusians who fled to North Africa after the fall of Muslim rule in Spain. They brought their architecture and music with them.',
+    follow:[['Wie zijn de Rifijnen?','Who are the Riffians?']] },
+  { id:'tifinaghjaar', keys:['wanneer erkend tifinagh','when was tifinagh recognized','sinds wanneer tifinagh'],
+    nl:'Tifinagh is sinds <strong>2003</strong> officieel erkend in Marokko en wordt sindsdien onderwezen op scholen — een belangrijk symbolisch moment voor een taal en cultuur die daarvoor decennialang nauwelijks zichtbaar was in het openbare leven.',
+    en:'Tifinagh has been officially recognized in Morocco since <strong>2003</strong>, and has been taught in schools ever since — an important symbolic moment for a language and culture that had barely been visible in public life for decades before that.',
+    follow:[['Hoe werkt Tifinagh?','How does Tifinagh work?']] },
+  { id:'vrouwelijk', keys:['vrouwelijk voorvoegsel','ta- voorvoegsel','feminine prefix','vrouwelijke woorden tamazight'],
+    nl:'Zelfstandige naamwoorden in het Tarifit krijgen vaak het voorvoegsel <strong>ta-</strong> (enkelvoud) of <strong>ti-</strong> (meervoud) als ze vrouwelijk zijn — bijvoorbeeld <em>ta-ddart</em> (huis) → <em>ti-ddarin</em> (huizen). Mannelijke woorden gebruiken juist <strong>a-</strong> of <strong>i-</strong>. Meer voorbeelden op de Uitleg-pagina, bij "Grammatica".',
+    en:'Nouns in Tarifit often take the prefix <strong>ta-</strong> (singular) or <strong>ti-</strong> (plural) when feminine — for example <em>ta-ddart</em> (house) → <em>ti-ddarin</em> (houses). Masculine nouns use <strong>a-</strong> or <strong>i-</strong> instead. More examples on the Guide page, under "Grammar".',
+    follow:[['Hoe werken werkwoorden?','How do verbs work?']] },
+  { id:'werkwoorden', keys:['werkwoorden vervoegen','hoe werken werkwoorden','verb conjugation','how do verbs work'],
+    nl:'Werkwoorden in Tarifit worden vervoegd met voor- en achtervoegsels rond de stam. Bijvoorbeeld <em>kkr</em> (opstaan): <strong>kkr-egh</strong> (ik sta op), <strong>t-kkr-ed</strong> (jij staat op), <strong>i-kkr</strong> (hij staat op). Volledig overzicht op de Uitleg-pagina, bij "Grammatica".',
+    en:'Verbs in Tarifit are conjugated with prefixes and suffixes around the stem. For example <em>kkr</em> (to stand up): <strong>kkr-egh</strong> (I stand up), <strong>t-kkr-ed</strong> (you stand up), <strong>i-kkr</strong> (he stands up). Full overview on the Guide page, under "Grammar".',
+    follow:[['Wat is het voorvoegsel ta-?','What is the ta- prefix?']] },
 ];
 
 /* Onthoud het laatst besproken onderwerp, voor vervolgvragen zoals "hoe oud was hij?" */
@@ -2569,9 +3073,10 @@ function aiFollowChips(follow) {
     '</div>';
 }
 
-const GREETINGS = ['azul','hallo','hoi','hey','hi','hello','goedemorgen','goedemiddag','goedenavond'];
-const THANKS = ['dank','dankje','dankjewel','bedankt','thanks','thank you','thx','merci'];
-const BYE = ['doei','tot ziens','dag','bye','goodbye','see you','beslama'];
+const GREETINGS = ['azul','hallo','hoi','hey','hi','hello','goedemorgen','goedemiddag','goedenavond','yo'];
+const THANKS = ['dank','dankje','dankjewel','bedankt','thanks','thank you','thx','merci','top','cool bedankt'];
+const BYE = ['doei','tot ziens','dag','bye','goodbye','see you','beslama','cya'];
+const HOWAREYOU = ['hoe gaat het','hoe gaat het met jou','how are you','hoe is het','gaat het goed'];
 const PRONOUNS = ['hij','hem','zijn','hem','ze','zij','haar','he','him','his','she','her'];
 const AGE_RE = /\b(hoe oud|leeftijd|how old)\b/;
 const BORN_RE = /\b(geboren|geboortejaar|born|birth ?year)\b/;
@@ -2579,6 +3084,7 @@ const DIED_RE = /\b(overleden|gestorven|stierf|died|death ?year|when did.*die)\b
 
 function aiIntent(q) {
   const n = normQ(q);
+  if (HOWAREYOU.some(g => n===g || n.startsWith(g))) return 'howareyou';
   if (GREETINGS.some(g => n===g || n.startsWith(g+' '))) return 'greeting';
   if (THANKS.some(g => n.includes(g))) return 'thanks';
   if (BYE.some(g => n===g || n.startsWith(g))) return 'bye';
@@ -2657,7 +3163,9 @@ function aiAnswer(q) {
   // Kleine talk / intents eerst afhandelen
   const intent = aiIntent(q);
   if (intent) {
-    const msg = intent==='greeting'
+    const msg = intent==='howareyou'
+      ? (lang==='en' ? 'Good, thanks for asking! 🙂 Ready to help you learn some Tarifit — what would you like to know?' : 'Goed, bedankt dat je het vraagt! 🙂 Ik help je graag met Tarifit — wat wil je weten?')
+      : intent==='greeting'
       ? (lang==='en' ? 'Azul! 👋 What would you like to learn — a word, a letter, or something about the culture?' : 'Azul! 👋 Wat wil je leren — een woord, een letter, of iets over de cultuur?')
       : intent==='thanks'
       ? (lang==='en' ? 'You\'re welcome! Anything else you\'d like to know?' : 'Graag gedaan! Nog iets anders dat je wilt weten?')
@@ -2779,6 +3287,7 @@ function submitFeedback() {
   const nl    = document.getElementById('fbNl').value.trim();
   const tif   = document.getElementById('fbTif').value.trim();
   const note  = document.getElementById('fbNote').value.trim();
+  const lang  = curLang();
 
   if (!email) {
     document.getElementById('fbEmail').focus();
@@ -2791,21 +3300,40 @@ function submitFeedback() {
     return;
   }
 
-  const subject = encodeURIComponent('Tifinaghhub — Woord aanvraag');
-  const body = encodeURIComponent(
-    'Van: ' + email + '\n\n' +
-    'Woord (Nederlands): ' + (nl  || '—') + '\n' +
-    'Woord (Tifinagh/Tamazight): ' + (tif  || '—') + '\n' +
-    'Opmerking: ' + (note || '—')
-  );
+  const btn = document.querySelector('#fbForm .fb-submit:not([style*="display: none"])') || document.querySelector('#fbForm .fb-submit');
+  const btns = document.querySelectorAll('#fbForm .fb-submit');
+  btns.forEach(b => { b.disabled = true; b.dataset.orig = b.textContent; b.textContent = lang === 'en' ? 'Sending…' : 'Versturen…'; });
 
-  window.location.href = 'mailto:tifinaghhub@gmail.com?subject=' + subject + '&body=' + body;
-
-  // Toon successcherm na korte vertraging
-  setTimeout(() => {
-    document.getElementById('fbForm').style.display = 'none';
-    document.getElementById('fbSuccess').style.display = 'block';
-  }, 500);
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      access_key: 'cc6e5e19-9ef2-4d9b-8c5c-393461ebfd7e',
+      subject: 'Tifinaghhub — Woord aanvraag',
+      from_name: 'Tifinaghhub woordvoorstel',
+      email: email,
+      'Woord (Nederlands)': nl || '—',
+      'Woord (Tifinagh/Tamazight)': tif || '—',
+      'Opmerking': note || '—'
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('fbForm').style.display = 'none';
+      document.getElementById('fbSuccess').style.display = 'block';
+    } else {
+      throw new Error(data.message || 'Onbekende fout');
+    }
+  })
+  .catch(err => {
+    alert(lang === 'en'
+      ? 'Something went wrong sending your message. Please try again later, or email tifinaghhub@gmail.com directly.'
+      : 'Er ging iets mis bij het versturen. Probeer het later nog eens, of mail rechtstreeks naar tifinaghhub@gmail.com.');
+  })
+  .finally(() => {
+    btns.forEach(b => { b.disabled = false; b.textContent = b.dataset.orig; });
+  });
 }
 
 // Sluit modal bij klik buiten (wachten tot de hele pagina geladen is,
@@ -2882,6 +3410,15 @@ setTimeout(() => {
   const activeBtn = document.querySelector('.nav-btn.active');
   if (activeBtn) moveIndicator(activeBtn);
 }, 0);
+
+// Herstel de laatst bezochte pagina na een refresh, i.p.v. altijd terug naar Thuis
+(function restoreLastPage() {
+  let lastPage = null;
+  try { lastPage = localStorage.getItem('tfh-lastpage'); } catch(e) {}
+  if (lastPage && lastPage !== 'thuis' && document.getElementById('page-' + lastPage)) {
+    goPage(lastPage);
+  }
+})();
 </script>
 <!-- ===== FEEDBACK MODAL ===== -->
 <div class="feedback-overlay" id="feedbackOverlay">
