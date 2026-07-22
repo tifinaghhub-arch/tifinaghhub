@@ -1288,7 +1288,7 @@ function authSignup() {
         .then(() => cred.user.sendEmailVerification())
         .then(() => { authShowVerify(email); });
     })
-    .catch(err => { authErr('authSignupError', authFriendlyError(err.code, lang)); });
+    .catch(err => { authErr('authSignupError', authFriendlyError(err.code, lang) + '  [' + (err.code || 'onbekend') + ']'); console.error('Signup error:', err); });
 }
 
 function authLogin() {
