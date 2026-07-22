@@ -1140,8 +1140,6 @@ textarea.fb-input{resize:vertical;min-height:80px}
         <span class="lang-nl">Nog geen account?</span><span class="lang-en">No account yet?</span>
         <button onclick="authShowSignup()"><span class="lang-nl">Registreren</span><span class="lang-en">Sign up</span></button>
       </div>
-      <button class="auth-link lang-nl" onclick="authPreviewBypass()" style="margin-top:.75rem;opacity:.6">Site bekijken zonder in te loggen (preview)</button>
-      <button class="auth-link lang-en" onclick="authPreviewBypass()" style="margin-top:.75rem;opacity:.6">View site without logging in (preview)</button>
     </div>
 
     <!-- SIGNUP -->
@@ -1309,8 +1307,9 @@ function authLogin() {
   const password = document.getElementById('loginPassword').value;
   if (!email || !password) { authErr('authLoginError', lang==='en' ? 'Please fill in both fields.' : 'Vul beide velden in.'); return; }
 
+  justAuthenticated = true;
   fbAuth.signInWithEmailAndPassword(email, password)
-    .catch(err => { authErr('authLoginError', authFriendlyError(err.code, lang)); });
+    .catch(err => { justAuthenticated = false; authErr('authLoginError', authFriendlyError(err.code, lang)); });
 }
 
 function authForgotPassword() {
@@ -1439,34 +1438,31 @@ function isRealLoggedIn() {
 }
 
 function authRequireLogin() {
-  try { sessionStorage.removeItem('tfh-preview'); } catch(e) {}
   document.getElementById('authGate').classList.remove('hidden');
   authShowLogin();
 }
 
-function authPreviewBypass() {
-  try { sessionStorage.setItem('tfh-preview', '1'); } catch(e) {}
-  document.getElementById('authGate').classList.add('hidden');
-}
+let justAuthenticated = false;
 
 // Centrale login-status check: toont de auth-gate of de site
 fbAuth.onAuthStateChanged(user => {
   const gate = document.getElementById('authGate');
-  let previewing = false;
-  try { previewing = sessionStorage.getItem('tfh-preview') === '1'; } catch(e) {}
   if (!user) {
-    if (previewing) { gate.classList.add('hidden'); return; }
     gate.classList.remove('hidden');
     authShowLogin();
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
   } else if (!user.emailVerified) {
-    if (previewing) { gate.classList.add('hidden'); return; }
     gate.classList.remove('hidden');
     authShowVerify(user.email);
   } else {
     gate.classList.add('hidden');
     if (typeof aiAccountLoadProfile === 'function') aiAccountLoadProfile();
+    if (justAuthenticated) {
+      justAuthenticated = false;
+      if (typeof goPage === 'function') goPage('thuis');
+      return;
+    }
     const activePage = document.querySelector('.page.active');
     if (activePage && typeof goPage === 'function') {
       const pid = activePage.id.replace('page-', '');
@@ -2506,6 +2502,9 @@ function goPage(id) {
     }, 50);
   }
   window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  setTimeout(() => { window.scrollTo(0, 0); }, 60);
 }
 
 function moveIndicator(btn) {
@@ -2638,26 +2637,11 @@ function renderW(data) {
     container.innerHTML = '<div class="no-results">' + (lang === 'en' ? 'No words found.' : 'Geen woorden gevonden.') + '</div>';
     return;
   }
-  const locked = !isRealLoggedIn();
-  const shown = locked ? data.slice(0, 3) : data;
   let html = '<table class="words-table"><thead><tr><th>' + (lang === 'en' ? 'English' : 'Nederlands') + '</th><th>Tamazight</th><th>Tifinagh</th></tr></thead><tbody>';
-  shown.forEach(w => {
+  data.forEach(w => {
     html += '<tr><td>' + esc(lang === 'en' ? w.en : w.nl) + '</td><td>' + esc(w.tam) + '</td><td class="tifi">' + esc(w.tifi) + '</td></tr>';
   });
   html += '</tbody></table>';
-  if (locked && data.length > 3) {
-    html += '<div class="locked-gate" style="padding:2rem 1.5rem">' +
-      '<div class="locked-box">' +
-        '<div class="locked-icon">🔒</div>' +
-        '<h2 class="lang-nl">Nog ' + (data.length - 3) + ' woorden te ontdekken</h2>' +
-        '<h2 class="lang-en">' + (data.length - 3) + ' more words to discover</h2>' +
-        '<p class="lang-nl">Log in of maak een gratis account aan om de volledige woordenlijst te zien.</p>' +
-        '<p class="lang-en">Log in or create a free account to see the full word list.</p>' +
-        '<button class="auth-btn-primary lang-nl" style="max-width:260px" onclick="authRequireLogin()">Inloggen / registreren</button>' +
-        '<button class="auth-btn-primary lang-en" style="max-width:260px" onclick="authRequireLogin()">Log in / sign up</button>' +
-      '</div>' +
-    '</div>';
-  }
   container.innerHTML = html;
 }
 
@@ -2827,8 +2811,12 @@ function showFeedback(correct, w) {
       : (lang === 'en' ? '✗ Wrong. The answer was: <strong>' + esc(w.tam) + '</strong> (' + esc(gloss) + ')' : '✗ Fout. Het antwoord was: <strong>' + esc(w.tam) + '</strong> (' + esc(gloss) + ')');
   }
   qIdx++;
-  setTimeout(() => { if (qIdx < qPool.length) nextQ(); else showDone(); }, 1600);
+  setTimeout(() => {
+    if (qIdx < qPool.length) nextQ(); else showDone();
+  }, 1600);
 }
+
+
 
 function showDone() {
   const lang = curLang();
@@ -2973,8 +2961,8 @@ function aiNewChat() {
   const box = document.getElementById('aiMessages');
   box.innerHTML = '';
   document.getElementById('aiChatTitleDisplay').textContent = 'AI Coach';
-  document.getElementById('aiInput').value = '';
-  document.getElementById('aiInput').style.height = 'auto';
+  const aiInputEl = document.getElementById('aiInput');
+  if (aiInputEl) { aiInputEl.value = ''; aiInputEl.style.height = 'auto'; }
   document.getElementById('aiBottomBar').style.display = 'none';
   document.querySelectorAll('.ai-chat-item').forEach(el => el.classList.remove('active'));
   aiRenderSidebar();
