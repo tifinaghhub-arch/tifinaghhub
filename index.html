@@ -1090,7 +1090,7 @@ textarea.fb-input{resize:vertical;min-height:80px}
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <script>
   const firebaseConfig = {
-    apiKey: "AIzaSyC-lNwvMCkJzOmOcAzoYU-X7cs3ZEWDQwo",
+    apiKey: "AIzaSyC-lNmvMCkJzOmOcAzoYU-X7cs3ZEWDQwo",
     authDomain: "tifinaghhub-dd4b2.firebaseapp.com",
     projectId: "tifinaghhub-dd4b2",
     storageBucket: "tifinaghhub-dd4b2.firebasestorage.app",
@@ -1288,7 +1288,7 @@ function authSignup() {
         .then(() => cred.user.sendEmailVerification())
         .then(() => { authShowVerify(email); });
     })
-    .catch(err => { authErr('authSignupError', authFriendlyError(err.code, lang) + '  [' + (err.code || 'onbekend') + ']'); console.error('Signup error:', err); });
+    .catch(err => { authErr('authSignupError', authFriendlyError(err.code, lang)); });
 }
 
 function authLogin() {
