@@ -81,8 +81,10 @@ input{font-family:'Karla',sans-serif}
 }
 
 /* ===== I18N ===== */
-html[lang="nl"] .lang-en{display:none !important}
-html[lang="en"] .lang-nl{display:none !important}
+html[lang="nl"] .lang-en,html[lang="nl"] .lang-fr,html[lang="nl"] .lang-es{display:none !important}
+html[lang="en"] .lang-nl,html[lang="en"] .lang-fr,html[lang="en"] .lang-es{display:none !important}
+html[lang="fr"] .lang-nl,html[lang="fr"] .lang-en,html[lang="fr"] .lang-es{display:none !important}
+html[lang="es"] .lang-nl,html[lang="es"] .lang-en,html[lang="es"] .lang-fr{display:none !important}
 nav{
   position:sticky;top:0;z-index:100;
   background:rgba(var(--bg-rgb),0.95);
@@ -104,6 +106,7 @@ nav{
 .nav-center{
   grid-column:2;
   justify-self:center;
+  position:relative;
 }
 .nav-right{
   grid-column:3;
@@ -645,12 +648,36 @@ footer{
   .uitleg-nav{position:static;display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:1rem}
   .voor-wie{grid-template-columns:1fr}
 }
+/* ===== MOBIEL "..."-NAVIGATIEMENU ===== */
+.mobile-menu-btn{
+  display:none;align-items:center;justify-content:center;
+  width:38px;height:38px;border-radius:8px;flex-shrink:0;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  cursor:pointer;transition:all .2s;
+}
+.mobile-menu-btn:hover{color:var(--fg);border-color:var(--accent)}
+.mobile-menu-btn svg{width:20px;height:20px}
+.mobile-nav-dropdown{
+  display:none;position:absolute;top:48px;right:0;left:auto;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);padding:.4rem;min-width:190px;
+  flex-direction:column;gap:.15rem;z-index:150;
+}
+.mobile-nav-dropdown.open{display:flex}
+.mobile-nav-item{
+  display:flex;align-items:center;gap:.6rem;
+  background:transparent;border:none;color:var(--muted);
+  padding:.65rem .8rem;border-radius:8px;font-size:.88rem;font-weight:600;
+  text-align:left;cursor:pointer;transition:all .15s;font-family:'Karla',sans-serif;
+}
+.mobile-nav-item:hover{background:rgba(var(--on-rgb),0.06);color:var(--fg)}
+.mobile-nav-item svg{width:16px;height:16px;flex-shrink:0}
+
 @media(max-width:600px){
   nav{padding:0 .75rem;gap:.4rem}
   .nav-logo{font-size:1rem}
-  .nav-btn{font-size:.76rem;padding:.35rem .55rem}
-  .nav-links{max-width:calc(100vw - 190px);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links{display:none}
+  .mobile-menu-btn{display:flex}
   .util-btn{padding:.35rem .5rem;font-size:0}
   .util-btn svg{width:14px;height:14px}
   #langBtnLabel{font-size:.72rem}
@@ -699,6 +726,12 @@ footer{
   border-bottom:1px solid var(--border);
   margin-bottom:4px;
 }
+.ai-sidebar-close{
+  display:none;margin-left:auto;flex-shrink:0;
+  width:30px;height:30px;align-items:center;justify-content:center;
+  background:transparent;border:none;color:var(--muted);cursor:pointer;border-radius:6px;
+}
+.ai-sidebar-close:hover{color:var(--fg);background:rgba(var(--on-rgb),0.06)}
 .ai-sb-logo-icon{
   width:32px;height:32px;border-radius:9px;
   box-shadow:0 0 0 1px rgba(var(--cta-rgb),0.2);
@@ -952,12 +985,6 @@ footer{
   max-width:680px;
 }
 
-@media(max-width:700px){
-  .ai-sidebar{display:none}
-  .ai-sidebar.mobile-open{display:flex;position:fixed;top:60px;left:0;bottom:0;z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.4)}
-  .ai-sidebar-toggle{display:flex}
-  .ai-sidebar-backdrop.open{display:block}
-}
 .ai-sidebar-toggle{
   display:none;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:8px;flex-shrink:0;
@@ -970,6 +997,14 @@ footer{
   background:rgba(0,0,0,0.5);z-index:199;
 }
 
+@media(max-width:700px){
+  .ai-sidebar{display:none}
+  .ai-sidebar.mobile-open{display:flex;position:fixed;top:60px;left:0;right:0;bottom:0;z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.4);width:100%;max-width:none}
+  .ai-sidebar-toggle{display:flex}
+  .ai-sidebar-backdrop.open{display:block}
+  .ai-sidebar-close{display:flex}
+}
+
 /* ===== AUTH GATE ===== */
 #authGate{
   position:fixed;inset:0;z-index:1000;
@@ -979,6 +1014,23 @@ footer{
   padding:2rem 1rem;overflow-y:auto;
 }
 #authGate.hidden{display:none}
+.auth-lang-btn{
+  background:var(--card);
+}
+.lang-dropdown{
+  display:none;position:absolute;top:calc(100% + .4rem);right:0;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);padding:.35rem;min-width:150px;
+  flex-direction:column;gap:.1rem;z-index:1002;
+}
+.lang-dropdown.open{display:flex}
+.lang-dropdown button{
+  display:block;width:100%;text-align:left;
+  background:transparent;border:none;color:var(--muted);
+  padding:.55rem .75rem;border-radius:8px;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:all .15s;font-family:'Karla',sans-serif;
+}
+.lang-dropdown button:hover{background:rgba(var(--on-rgb),0.06);color:var(--fg)}
 .auth-box{
   width:100%;max-width:420px;
   background:var(--card);border:1px solid var(--border);
@@ -1091,7 +1143,7 @@ textarea.fb-input{resize:vertical;min-height:80px}
 .fb-success .fb-icon{font-size:2.5rem;margin-bottom:.5rem}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>emailjs.init('YOUR_PUBLIC_KEY');</script>
+<script>emailjs.init('1vY5NNMur0cqoSSus');</script>
 
 <!-- ===== FIREBASE (account/login) ===== -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -1116,6 +1168,18 @@ textarea.fb-input{resize:vertical;min-height:80px}
 
 <!-- ===== AUTH GATE ===== -->
 <div id="authGate">
+  <div style="position:fixed;top:1rem;right:1rem;z-index:1001">
+    <button class="util-btn auth-lang-btn" id="authLangBtn" onclick="toggleLangMenu(event,'authLangDropdown')" aria-label="Switch language" title="Switch language">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18Z"/></svg>
+      <span id="authLangBtnLabel">EN</span>
+    </button>
+    <div class="lang-dropdown" id="authLangDropdown">
+      <button onclick="applyLang('nl');closeLangMenus()">Nederlands</button>
+      <button onclick="applyLang('en');closeLangMenus()">English</button>
+      <button onclick="applyLang('fr');closeLangMenus()">Français</button>
+      <button onclick="applyLang('es');closeLangMenus()">Español</button>
+    </div>
+  </div>
   <div class="auth-box">
     <div class="auth-logo"><span class="tifi">ⵣ</span> Tifinaghhub</div>
 
@@ -1123,22 +1187,35 @@ textarea.fb-input{resize:vertical;min-height:80px}
     <div id="authLogin">
       <h2 class="lang-nl">Welkom terug</h2>
       <h2 class="lang-en">Welcome back</h2>
+      <h2 class="lang-fr">Bon retour</h2>
+      <h2 class="lang-es">Bienvenido de nuevo</h2>
       <p class="auth-sub lang-nl">Log in om verder te gaan met leren.</p>
       <p class="auth-sub lang-en">Log in to continue learning.</p>
+      <p class="auth-sub lang-fr">Connectez-vous pour continuer à apprendre.</p>
+      <p class="auth-sub lang-es">Inicia sesión para seguir aprendiendo.</p>
       <div id="authLoginError" class="auth-error" style="display:none"></div>
       <label class="fb-label lang-nl">E-mail</label>
       <label class="fb-label lang-en">Email</label>
+      <label class="fb-label lang-fr">E-mail</label>
+      <label class="fb-label lang-es">Correo electrónico</label>
       <input class="fb-input" id="loginEmail" type="email" placeholder="naam@voorbeeld.com" autocomplete="username">
       <label class="fb-label lang-nl">Wachtwoord</label>
       <label class="fb-label lang-en">Password</label>
+      <label class="fb-label lang-fr">Mot de passe</label>
+      <label class="fb-label lang-es">Contraseña</label>
       <div class="pw-wrap"><input class="fb-input" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password"><button type="button" class="pw-toggle" onclick="toggleAuthPassword('loginPassword', this)" aria-label="Show/hide password"><svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M6.61 6.61A18.36 18.36 0 0 0 1 12s4 8 11 8a9.26 9.26 0 0 0 5.39-1.61"/><path d="M1 1l22 22"/></svg></button></div>
       <button class="auth-btn-primary lang-nl" onclick="authLogin()">Inloggen</button>
       <button class="auth-btn-primary lang-en" onclick="authLogin()">Log in</button>
+      <button class="auth-btn-primary lang-fr" onclick="authLogin()">Se connecter</button>
+      <button class="auth-btn-primary lang-es" onclick="authLogin()">Iniciar sesión</button>
       <button class="auth-link lang-nl" onclick="authForgotPassword()">Wachtwoord vergeten?</button>
       <button class="auth-link lang-en" onclick="authForgotPassword()">Forgot password?</button>
+      <button class="auth-link lang-fr" onclick="authForgotPassword()">Mot de passe oublié ?</button>
+      <button class="auth-link lang-es" onclick="authForgotPassword()">¿Olvidaste tu contraseña?</button>
       <div class="auth-switch">
         <span class="lang-nl">Nog geen account?</span><span class="lang-en">No account yet?</span>
-        <button onclick="authShowSignup()"><span class="lang-nl">Registreren</span><span class="lang-en">Sign up</span></button>
+        <span class="lang-fr">Pas encore de compte ?</span><span class="lang-es">¿Aún no tienes cuenta?</span>
+        <button onclick="authShowSignup()"><span class="lang-nl">Registreren</span><span class="lang-en">Sign up</span><span class="lang-fr">S'inscrire</span><span class="lang-es">Registrarse</span></button>
       </div>
     </div>
 
@@ -1146,40 +1223,59 @@ textarea.fb-input{resize:vertical;min-height:80px}
     <div id="authSignup" style="display:none">
       <h2 class="lang-nl">Account aanmaken</h2>
       <h2 class="lang-en">Create an account</h2>
+      <h2 class="lang-fr">Créer un compte</h2>
+      <h2 class="lang-es">Crear una cuenta</h2>
       <p class="auth-sub lang-nl">Gratis, en je hoeft het maar één keer te doen.</p>
       <p class="auth-sub lang-en">Free, and you only have to do it once.</p>
+      <p class="auth-sub lang-fr">Gratuit, et vous ne le faites qu'une seule fois.</p>
+      <p class="auth-sub lang-es">Gratis, y solo tienes que hacerlo una vez.</p>
       <div id="authSignupError" class="auth-error" style="display:none"></div>
       <div style="display:flex;gap:.75rem">
         <div style="flex:1">
           <label class="fb-label lang-nl">Voornaam</label>
           <label class="fb-label lang-en">First name</label>
+          <label class="fb-label lang-fr">Prénom</label>
+          <label class="fb-label lang-es">Nombre</label>
           <input class="fb-input" id="suFirstName" type="text">
         </div>
         <div style="flex:1">
           <label class="fb-label lang-nl">Achternaam</label>
           <label class="fb-label lang-en">Last name</label>
+          <label class="fb-label lang-fr">Nom</label>
+          <label class="fb-label lang-es">Apellido</label>
           <input class="fb-input" id="suLastName" type="text">
         </div>
       </div>
       <label class="fb-label lang-nl">E-mail</label>
       <label class="fb-label lang-en">Email</label>
+      <label class="fb-label lang-fr">E-mail</label>
+      <label class="fb-label lang-es">Correo electrónico</label>
       <input class="fb-input" id="suEmail" type="email" placeholder="naam@voorbeeld.com" autocomplete="username">
       <label class="fb-label lang-nl">Geboortedatum</label>
       <label class="fb-label lang-en">Date of birth</label>
+      <label class="fb-label lang-fr">Date de naissance</label>
+      <label class="fb-label lang-es">Fecha de nacimiento</label>
       <input class="fb-input" id="suBirthdate" type="date">
       <label class="fb-label lang-nl">Wachtwoord</label>
       <label class="fb-label lang-en">Password</label>
+      <label class="fb-label lang-fr">Mot de passe</label>
+      <label class="fb-label lang-es">Contraseña</label>
       <div class="pw-wrap"><input class="fb-input" id="suPassword" type="password" placeholder="Minimaal 6 tekens" autocomplete="new-password"><button type="button" class="pw-toggle" onclick="toggleAuthPassword('suPassword', this)" aria-label="Show/hide password"><svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M6.61 6.61A18.36 18.36 0 0 0 1 12s4 8 11 8a9.26 9.26 0 0 0 5.39-1.61"/><path d="M1 1l22 22"/></svg></button></div>
       <label class="auth-checkbox">
         <input type="checkbox" id="suTerms">
         <span class="lang-nl">Ik ga akkoord met de <button type="button" class="auth-terms-link" onclick="authShowTerms()">gebruiksvoorwaarden</button></span>
         <span class="lang-en">I agree to the <button type="button" class="auth-terms-link" onclick="authShowTerms()">terms of use</button></span>
+        <span class="lang-fr">J'accepte les <button type="button" class="auth-terms-link" onclick="authShowTerms()">conditions d'utilisation</button></span>
+        <span class="lang-es">Acepto los <button type="button" class="auth-terms-link" onclick="authShowTerms()">términos de uso</button></span>
       </label>
       <button class="auth-btn-primary lang-nl" onclick="authSignup()">Account aanmaken</button>
       <button class="auth-btn-primary lang-en" onclick="authSignup()">Create account</button>
+      <button class="auth-btn-primary lang-fr" onclick="authSignup()">Créer un compte</button>
+      <button class="auth-btn-primary lang-es" onclick="authSignup()">Crear cuenta</button>
       <div class="auth-switch">
         <span class="lang-nl">Heb je al een account?</span><span class="lang-en">Already have an account?</span>
-        <button onclick="authShowLogin()"><span class="lang-nl">Inloggen</span><span class="lang-en">Log in</span></button>
+        <span class="lang-fr">Vous avez déjà un compte ?</span><span class="lang-es">¿Ya tienes una cuenta?</span>
+        <button onclick="authShowLogin()"><span class="lang-nl">Inloggen</span><span class="lang-en">Log in</span><span class="lang-fr">Se connecter</span><span class="lang-es">Iniciar sesión</span></button>
       </div>
     </div>
 
@@ -1188,14 +1284,24 @@ textarea.fb-input{resize:vertical;min-height:80px}
       <div class="fb-icon" style="margin:0 auto 1rem">✉️</div>
       <h2 class="lang-nl">Bevestig je e-mailadres</h2>
       <h2 class="lang-en">Confirm your email</h2>
+      <h2 class="lang-fr">Confirmez votre e-mail</h2>
+      <h2 class="lang-es">Confirma tu correo</h2>
       <p class="auth-sub lang-nl">We hebben een bevestigingslink gestuurd naar <strong id="authVerifyEmail"></strong>. Klik op de link in die mail, en ververs dan deze pagina.</p>
       <p class="auth-sub lang-en">We've sent a confirmation link to <strong id="authVerifyEmailEn"></strong>. Click the link in that email, then refresh this page.</p>
+      <p class="auth-sub lang-fr">Nous avons envoyé un lien de confirmation à <strong id="authVerifyEmailFr"></strong>. Cliquez sur le lien, puis actualisez cette page.</p>
+      <p class="auth-sub lang-es">Hemos enviado un enlace de confirmación a <strong id="authVerifyEmailEs"></strong>. Haz clic en el enlace y luego actualiza esta página.</p>
       <button class="auth-btn-primary lang-nl" onclick="authCheckVerified()">Ik heb bevestigd, ga verder</button>
       <button class="auth-btn-primary lang-en" onclick="authCheckVerified()">I've confirmed, continue</button>
+      <button class="auth-btn-primary lang-fr" onclick="authCheckVerified()">J'ai confirmé, continuer</button>
+      <button class="auth-btn-primary lang-es" onclick="authCheckVerified()">He confirmado, continuar</button>
       <button class="auth-link lang-nl" onclick="authResendVerification()">Mail opnieuw versturen</button>
       <button class="auth-link lang-en" onclick="authResendVerification()">Resend email</button>
+      <button class="auth-link lang-fr" onclick="authResendVerification()">Renvoyer l'e-mail</button>
+      <button class="auth-link lang-es" onclick="authResendVerification()">Reenviar correo</button>
       <button class="auth-link lang-nl" onclick="authLogout()">Uitloggen</button>
       <button class="auth-link lang-en" onclick="authLogout()">Log out</button>
+      <button class="auth-link lang-fr" onclick="authLogout()">Se déconnecter</button>
+      <button class="auth-link lang-es" onclick="authLogout()">Cerrar sesión</button>
     </div>
   </div>
 </div>
@@ -1252,6 +1358,8 @@ function authShowVerify(email) {
   document.getElementById('authVerify').style.display = 'block';
   document.getElementById('authVerifyEmail').textContent = email;
   document.getElementById('authVerifyEmailEn').textContent = email;
+  const frEl = document.getElementById('authVerifyEmailFr'); if (frEl) frEl.textContent = email;
+  const esEl = document.getElementById('authVerifyEmailEs'); if (esEl) esEl.textContent = email;
 }
 function authShowTerms() { document.getElementById('termsOverlay').classList.add('open'); }
 function closeTerms() { document.getElementById('termsOverlay').classList.remove('open'); }
@@ -1259,21 +1367,62 @@ function closeTerms() { document.getElementById('termsOverlay').classList.remove
 function authErr(el, msg) { const e = document.getElementById(el); e.textContent = msg; e.style.display = 'block'; }
 function authErrClear(el) { document.getElementById(el).style.display = 'none'; }
 
+function tr4(lang, nl, en, fr, es) {
+  return lang==='en' ? en : lang==='fr' ? fr : lang==='es' ? es : nl;
+}
+
+function sendThankYouEmail(toEmail, toName, lang, kind) {
+  // kind: 'signup' of 'wordSuggestion'
+  const subject = kind === 'signup'
+    ? tr4(lang,'Welkom bij Tifinaghhub!','Welcome to Tifinaghhub!','Bienvenue sur Tifinaghhub !','¡Bienvenido a Tifinaghhub!')
+    : tr4(lang,'Bedankt voor je woordsuggestie!','Thanks for your word suggestion!','Merci pour votre suggestion de mot !','¡Gracias por tu sugerencia de palabra!');
+
+  const greeting = tr4(lang,'Azul' + (toName ? ' ' + toName : '') + '! 👋','Azul' + (toName ? ' ' + toName : '') + '! 👋','Azul' + (toName ? ' ' + toName : '') + ' ! 👋','¡Azul' + (toName ? ' ' + toName : '') + '! 👋');
+
+  const body = kind === 'signup'
+    ? tr4(lang,
+        'Bedankt dat je een account hebt aangemaakt op Tifinaghhub. Je kunt nu aan de slag met het alfabet, de woordenlijst, oefeningen en de AI Coach.',
+        'Thanks for creating an account on Tifinaghhub. You can now dive into the alphabet, word list, exercises, and the AI Coach.',
+        'Merci d\'avoir créé un compte sur Tifinaghhub. Vous pouvez maintenant découvrir l\'alphabet, la liste de mots, les exercices et l\'AI Coach.',
+        'Gracias por crear una cuenta en Tifinaghhub. Ya puedes explorar el alfabeto, la lista de palabras, los ejercicios y el AI Coach.')
+    : tr4(lang,
+        'Bedankt voor je bijdrage aan de woordenlijst van Tifinaghhub! We bekijken je voorstel en voegen het zo snel mogelijk toe.',
+        'Thanks for contributing to the Tifinaghhub word list! We\'ll review your suggestion and add it as soon as possible.',
+        'Merci de contribuer à la liste de mots de Tifinaghhub ! Nous allons examiner votre suggestion et l\'ajouter dès que possible.',
+        '¡Gracias por contribuir a la lista de palabras de Tifinaghhub! Revisaremos tu sugerencia y la añadiremos lo antes posible.');
+
+  const closing = tr4(lang,
+    'Tot snel op Tifinaghhub!\n✳ Het Tifinaghhub-team',
+    'See you soon on Tifinaghhub!\n✳ The Tifinaghhub team',
+    'À bientôt sur Tifinaghhub !\n✳ L\'équipe Tifinaghhub',
+    '¡Hasta pronto en Tifinaghhub!\n✳ El equipo de Tifinaghhub');
+
+  const message = greeting + '\n\n' + body + '\n\n' + closing;
+
+  if (typeof emailjs === 'undefined') return;
+  emailjs.send('service_5odrq51', 'template_cneqgh8', {
+    to_email: toEmail,
+    to_name: toName || '',
+    subject: subject,
+    message: message
+  }).catch(err => console.error('EmailJS fout:', err));
+}
+
 function authFriendlyError(code, lang) {
   const map = {
-    'auth/email-already-in-use': lang==='en' ? 'This email is already in use.' : 'Dit e-mailadres is al in gebruik.',
-    'auth/invalid-email': lang==='en' ? 'Invalid email address.' : 'Ongeldig e-mailadres.',
-    'auth/weak-password': lang==='en' ? 'Password must be at least 6 characters.' : 'Wachtwoord moet minimaal 6 tekens zijn.',
-    'auth/user-not-found': lang==='en' ? 'No account found with this email.' : 'Geen account gevonden met dit e-mailadres.',
-    'auth/wrong-password': lang==='en' ? 'Incorrect password.' : 'Onjuist wachtwoord.',
-    'auth/invalid-credential': lang==='en' ? 'Incorrect email or password.' : 'Onjuiste combinatie van e-mail en wachtwoord.',
-    'auth/too-many-requests': lang==='en' ? 'Too many attempts. Please try again later.' : 'Te veel pogingen. Probeer het later opnieuw.',
+    'auth/email-already-in-use': tr4(lang,'Dit e-mailadres is al in gebruik.','This email is already in use.','Cette adresse e-mail est déjà utilisée.','Este correo ya está en uso.'),
+    'auth/invalid-email': tr4(lang,'Ongeldig e-mailadres.','Invalid email address.','Adresse e-mail invalide.','Dirección de correo no válida.'),
+    'auth/weak-password': tr4(lang,'Wachtwoord moet minimaal 6 tekens zijn.','Password must be at least 6 characters.','Le mot de passe doit contenir au moins 6 caractères.','La contraseña debe tener al menos 6 caracteres.'),
+    'auth/user-not-found': tr4(lang,'Geen account gevonden met dit e-mailadres.','No account found with this email.','Aucun compte trouvé avec cet e-mail.','No se encontró ninguna cuenta con este correo.'),
+    'auth/wrong-password': tr4(lang,'Onjuist wachtwoord.','Incorrect password.','Mot de passe incorrect.','Contraseña incorrecta.'),
+    'auth/invalid-credential': tr4(lang,'Onjuiste combinatie van e-mail en wachtwoord.','Incorrect email or password.','E-mail ou mot de passe incorrect.','Correo o contraseña incorrectos.'),
+    'auth/too-many-requests': tr4(lang,'Te veel pogingen. Probeer het later opnieuw.','Too many attempts. Please try again later.','Trop de tentatives. Réessayez plus tard.','Demasiados intentos. Inténtalo más tarde.'),
   };
-  return map[code] || (lang==='en' ? 'Something went wrong. Please try again.' : 'Er ging iets mis. Probeer het opnieuw.');
+  return map[code] || tr4(lang,'Er ging iets mis. Probeer het opnieuw.','Something went wrong. Please try again.','Une erreur est survenue. Réessayez.','Algo salió mal. Inténtalo de nuevo.');
 }
 
 function authSignup() {
-  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const lang = curLang();
   authErrClear('authSignupError');
   const firstName = document.getElementById('suFirstName').value.trim();
   const lastName  = document.getElementById('suLastName').value.trim();
@@ -1282,10 +1431,10 @@ function authSignup() {
   const password  = document.getElementById('suPassword').value;
   const termsOk   = document.getElementById('suTerms').checked;
 
-  if (!firstName || !lastName) { authErr('authSignupError', lang==='en' ? 'Please fill in your first and last name.' : 'Vul je voor- en achternaam in.'); return; }
-  if (!email) { authErr('authSignupError', lang==='en' ? 'Please fill in your email.' : 'Vul je e-mailadres in.'); return; }
-  if (!password || password.length < 6) { authErr('authSignupError', lang==='en' ? 'Password must be at least 6 characters.' : 'Wachtwoord moet minimaal 6 tekens zijn.'); return; }
-  if (!termsOk) { authErr('authSignupError', lang==='en' ? 'You must accept the terms of use.' : 'Je moet akkoord gaan met de gebruiksvoorwaarden.'); return; }
+  if (!firstName || !lastName) { authErr('authSignupError', tr4(lang,'Vul je voor- en achternaam in.','Please fill in your first and last name.','Veuillez indiquer votre prénom et votre nom.','Rellena tu nombre y apellido.')); return; }
+  if (!email) { authErr('authSignupError', tr4(lang,'Vul je e-mailadres in.','Please fill in your email.','Veuillez indiquer votre e-mail.','Rellena tu correo electrónico.')); return; }
+  if (!password || password.length < 6) { authErr('authSignupError', tr4(lang,'Wachtwoord moet minimaal 6 tekens zijn.','Password must be at least 6 characters.','Le mot de passe doit contenir au moins 6 caractères.','La contraseña debe tener al menos 6 caracteres.')); return; }
+  if (!termsOk) { authErr('authSignupError', tr4(lang,'Je moet akkoord gaan met de gebruiksvoorwaarden.','You must accept the terms of use.','Vous devez accepter les conditions d\'utilisation.','Debes aceptar los términos de uso.')); return; }
 
   fbAuth.createUserWithEmailAndPassword(email, password)
     .then(cred => {
@@ -1294,18 +1443,21 @@ function authSignup() {
         firstName, lastName, email, birthdate: birthdate || null,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => cred.user.updateProfile({ displayName: firstName + ' ' + lastName }))
-        .then(() => cred.user.sendEmailVerification())
-        .then(() => { authShowVerify(email); });
+        .then(() => { fbAuth.languageCode = lang; return cred.user.sendEmailVerification(); })
+        .then(() => {
+          sendThankYouEmail(email, firstName, lang, 'signup');
+          authShowVerify(email);
+        });
     })
     .catch(err => { authErr('authSignupError', authFriendlyError(err.code, lang)); });
 }
 
 function authLogin() {
-  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const lang = curLang();
   authErrClear('authLoginError');
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-  if (!email || !password) { authErr('authLoginError', lang==='en' ? 'Please fill in both fields.' : 'Vul beide velden in.'); return; }
+  if (!email || !password) { authErr('authLoginError', tr4(lang,'Vul beide velden in.','Please fill in both fields.','Veuillez remplir les deux champs.','Rellena ambos campos.')); return; }
 
   justAuthenticated = true;
   fbAuth.signInWithEmailAndPassword(email, password)
@@ -1313,34 +1465,36 @@ function authLogin() {
 }
 
 function authForgotPassword() {
-  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const lang = curLang();
   const email = document.getElementById('loginEmail').value.trim();
-  if (!email) { authErr('authLoginError', lang==='en' ? 'Fill in your email above first, then click this link.' : 'Vul eerst je e-mail hierboven in, klik dan op deze link.'); return; }
+  if (!email) { authErr('authLoginError', tr4(lang,'Vul eerst je e-mail hierboven in, klik dan op deze link.','Fill in your email above first, then click this link.','Renseignez d\'abord votre e-mail ci-dessus, puis cliquez sur ce lien.','Rellena tu correo arriba primero y luego haz clic en este enlace.')); return; }
+  fbAuth.languageCode = lang;
   fbAuth.sendPasswordResetEmail(email)
-    .then(() => { authErrClear('authLoginError'); alert(lang==='en' ? 'A password reset link has been sent to ' + email : 'Er is een link om je wachtwoord te resetten gestuurd naar ' + email); })
+    .then(() => { authErrClear('authLoginError'); alert(tr4(lang,'Er is een link om je wachtwoord te resetten gestuurd naar ','A password reset link has been sent to ','Un lien de réinitialisation a été envoyé à ','Se ha enviado un enlace para restablecer la contraseña a ') + email); })
     .catch(err => { authErr('authLoginError', authFriendlyError(err.code, lang)); });
 }
 
 function authCheckVerified() {
-  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const lang = curLang();
   const user = fbAuth.currentUser;
   if (!user) return;
   user.reload().then(() => {
     if (user.emailVerified) {
       location.reload();
     } else {
-      alert(lang==='en' ? 'Not verified yet — check your inbox (and spam folder).' : 'Nog niet bevestigd — check je inbox (en spam-map).');
+      alert(tr4(lang,'Nog niet bevestigd — check je inbox (en spam-map).','Not verified yet — check your inbox (and spam folder).','Pas encore confirmé — vérifiez votre boîte mail (et vos spams).','Aún no confirmado — revisa tu bandeja de entrada (y el spam).'));
     }
   });
 }
 
 function authResendVerification() {
-  const lang = (document.documentElement.getAttribute('lang')==='en') ? 'en' : 'nl';
+  const lang = curLang();
   const user = fbAuth.currentUser;
   if (!user) return;
+  fbAuth.languageCode = lang;
   user.sendEmailVerification()
-    .then(() => alert(lang==='en' ? 'Email sent again!' : 'Mail opnieuw verstuurd!'))
-    .catch(() => alert(lang==='en' ? 'Could not resend right now, try again shortly.' : 'Kon niet opnieuw versturen, probeer zo weer.'));
+    .then(() => alert(tr4(lang,'Mail opnieuw verstuurd!','Email sent again!','E-mail renvoyé !','¡Correo reenviado!')))
+    .catch(() => alert(tr4(lang,'Kon niet opnieuw versturen, probeer zo weer.','Could not resend right now, try again shortly.','Impossible de renvoyer pour le moment, réessayez bientôt.','No se pudo reenviar ahora, inténtalo de nuevo pronto.')));
 }
 
 function authLogout() {
@@ -1479,19 +1633,27 @@ fbAuth.onAuthStateChanged(user => {
   <div class="nav-center">
     <div class="nav-links" id="navLinks">
       <button class="nav-btn active" onclick="goPage('thuis')" aria-label="Thuis" title="Thuis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1V9.5"/></svg></button>
-      <button class="nav-btn" onclick="goPage('alfabet')"><span class="lang-nl">Alfabet</span><span class="lang-en">Alphabet</span></button>
-      <button class="nav-btn" onclick="goPage('woorden')"><span class="lang-nl">Woorden</span><span class="lang-en">Words</span></button>
-      <button class="nav-btn" onclick="goPage('oefenen')"><span class="lang-nl">Oefenen</span><span class="lang-en">Practice</span></button>
-      <button class="nav-btn" onclick="goPage('uitleg')"><span class="lang-nl">Uitleg</span><span class="lang-en">Guide</span></button>
+      <button class="nav-btn" onclick="goPage('alfabet')"><span class="lang-nl">Alfabet</span><span class="lang-en">Alphabet</span><span class="lang-fr">Alphabet</span><span class="lang-es">Alfabeto</span></button>
+      <button class="nav-btn" onclick="goPage('woorden')"><span class="lang-nl">Woorden</span><span class="lang-en">Words</span><span class="lang-fr">Mots</span><span class="lang-es">Palabras</span></button>
+      <button class="nav-btn" onclick="goPage('oefenen')"><span class="lang-nl">Oefenen</span><span class="lang-en">Practice</span><span class="lang-fr">Pratiquer</span><span class="lang-es">Practicar</span></button>
+      <button class="nav-btn" onclick="goPage('uitleg')"><span class="lang-nl">Uitleg</span><span class="lang-en">Guide</span><span class="lang-fr">Guide</span><span class="lang-es">Guía</span></button>
       <button class="nav-btn" onclick="goPage('ai')">AI Coach</button>
       <div class="nav-indicator" id="navIndicator"></div>
     </div>
   </div>
   <div class="nav-right">
-    <button class="util-btn" id="langBtn" onclick="toggleLang()" aria-label="Switch language" title="Switch language">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18Z"/></svg>
-      <span id="langBtnLabel">EN</span>
-    </button>
+    <div style="position:relative">
+      <button class="util-btn" id="langBtn" onclick="toggleLangMenu(event,'navLangDropdown')" aria-label="Switch language" title="Switch language">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18Z"/></svg>
+        <span id="langBtnLabel">EN</span>
+      </button>
+      <div class="lang-dropdown" id="navLangDropdown">
+        <button onclick="applyLang('nl');closeLangMenus()">Nederlands</button>
+        <button onclick="applyLang('en');closeLangMenus()">English</button>
+        <button onclick="applyLang('fr');closeLangMenus()">Français</button>
+        <button onclick="applyLang('es');closeLangMenus()">Español</button>
+      </div>
+    </div>
     <button class="util-btn theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle dark/light theme" title="Toggle dark/light theme">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -1499,6 +1661,22 @@ fbAuth.onAuthStateChanged(user => {
     <button class="util-btn" id="accountBtn" onclick="goPage('account')" aria-label="Account" title="Account">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
     </button>
+    <div style="position:relative">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileNav(event)" aria-label="Menu" title="Menu">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+      </button>
+      <div class="mobile-nav-dropdown" id="mobileNavDropdown">
+        <button class="mobile-nav-item" onclick="goPage('thuis');toggleMobileNav()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1V9.5"/></svg>
+          <span class="lang-nl">Thuis</span><span class="lang-en">Home</span><span class="lang-fr">Accueil</span><span class="lang-es">Inicio</span>
+        </button>
+        <button class="mobile-nav-item" onclick="goPage('alfabet');toggleMobileNav()"><span class="lang-nl">Alfabet</span><span class="lang-en">Alphabet</span><span class="lang-fr">Alphabet</span><span class="lang-es">Alfabeto</span></button>
+        <button class="mobile-nav-item" onclick="goPage('woorden');toggleMobileNav()"><span class="lang-nl">Woorden</span><span class="lang-en">Words</span><span class="lang-fr">Mots</span><span class="lang-es">Palabras</span></button>
+        <button class="mobile-nav-item" onclick="goPage('oefenen');toggleMobileNav()"><span class="lang-nl">Oefenen</span><span class="lang-en">Practice</span><span class="lang-fr">Pratiquer</span><span class="lang-es">Practicar</span></button>
+        <button class="mobile-nav-item" onclick="goPage('uitleg');toggleMobileNav()"><span class="lang-nl">Uitleg</span><span class="lang-en">Guide</span><span class="lang-fr">Guide</span><span class="lang-es">Guía</span></button>
+        <button class="mobile-nav-item" onclick="goPage('ai');toggleMobileNav()">AI Coach</button>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -1509,13 +1687,21 @@ fbAuth.onAuthStateChanged(user => {
       <div class="tag">Aitwayagher · Al Hoceima · Rif</div>
       <h1 class="lang-nl">Leer de taal van <em>jouw</em> grootouders.</h1>
       <h1 class="lang-en">Learn the language of <em>your</em> grandparents.</h1>
+      <h1 class="lang-fr">Apprenez la langue de <em>vos</em> grands-parents.</h1>
+      <h1 class="lang-es">Aprende el idioma de <em>tus</em> abuelos.</h1>
       <p class="hero-sub lang-nl">Tarifit is de Berbertaal van het Rif-gebergte. Ontdek het alfabet, leer woorden en oefen met uitspraken — stap voor stap.</p>
       <p class="hero-sub lang-en">Tarifit is the Berber language of the Rif mountains. Discover the alphabet, learn words, and practice pronunciation — step by step.</p>
+      <p class="hero-sub lang-fr">Le tarifit est la langue berbère des montagnes du Rif. Découvrez l'alphabet, apprenez des mots et entraînez-vous à la prononciation — étape par étape.</p>
+      <p class="hero-sub lang-es">El tarifit es la lengua bereber de las montañas del Rif. Descubre el alfabeto, aprende palabras y practica la pronunciación — paso a paso.</p>
       <div class="hero-btns">
         <button class="btn btn-primary lang-nl" onclick="goPage('alfabet')">Begin met het alfabet</button>
         <button class="btn btn-primary lang-en" onclick="goPage('alfabet')">Start with the alphabet</button>
+        <button class="btn btn-primary lang-fr" onclick="goPage('alfabet')">Commencer par l'alphabet</button>
+        <button class="btn btn-primary lang-es" onclick="goPage('alfabet')">Empezar con el alfabeto</button>
         <button class="btn btn-outline lang-nl" onclick="goPage('woorden')">Bekijk woorden</button>
         <button class="btn btn-outline lang-en" onclick="goPage('woorden')">Browse words</button>
+        <button class="btn btn-outline lang-fr" onclick="goPage('woorden')">Voir les mots</button>
+        <button class="btn btn-outline lang-es" onclick="goPage('woorden')">Ver palabras</button>
       </div>
     </div>
 
@@ -1528,29 +1714,45 @@ fbAuth.onAuthStateChanged(user => {
             <div class="feat-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4a2 2 0 0 1 2-2h8.5L20 6.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 2v5h5"/><path d="M8 13h8M8 17h5"/></svg></div>
             <h3 class="lang-nl">Alfabet</h3>
             <h3 class="lang-en">Alphabet</h3>
+            <h3 class="lang-fr">Alphabet</h3>
+            <h3 class="lang-es">Alfabeto</h3>
             <p class="lang-nl">31 Tifinagh-letters met uitspraak, beschrijving en voorbeelden.</p>
             <p class="lang-en">31 Tifinagh letters with pronunciation, description, and examples.</p>
+            <p class="lang-fr">31 lettres Tifinagh avec prononciation, description et exemples.</p>
+            <p class="lang-es">31 letras Tifinagh con pronunciación, descripción y ejemplos.</p>
           </div>
           <div class="feat-card" onclick="goPage('oefenen')">
             <div class="feat-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
             <h3 class="lang-nl">Oefenen</h3>
             <h3 class="lang-en">Practice</h3>
+            <h3 class="lang-fr">Pratiquer</h3>
+            <h3 class="lang-es">Practicar</h3>
             <p class="lang-nl">Test jezelf met typen, meerkeuze en omgekeerde vragen.</p>
             <p class="lang-en">Test yourself with typing, multiple choice, and reverse questions.</p>
+            <p class="lang-fr">Testez-vous avec des questions à choix multiples et de traduction.</p>
+            <p class="lang-es">Ponte a prueba con preguntas de opción múltiple y traducción.</p>
           </div>
           <div class="feat-card" onclick="goPage('woorden')">
             <div class="feat-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
             <h3 class="lang-nl">Woorden</h3>
             <h3 class="lang-en">Words</h3>
+            <h3 class="lang-fr">Mots</h3>
+            <h3 class="lang-es">Palabras</h3>
             <p class="lang-nl">Meer dan 100 woorden verdeeld over 11 categorieën.</p>
             <p class="lang-en">Over 100 words spread across 11 categories.</p>
+            <p class="lang-fr">Plus de 100 mots répartis en 11 catégories.</p>
+            <p class="lang-es">Más de 100 palabras repartidas en 11 categorías.</p>
           </div>
           <div class="feat-card" onclick="goPage('uitleg')">
             <div class="feat-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5.2 8.3 4.5 6 4.5c-1 0-2 .1-3 .4v13.6c1-.3 2-.4 3-.4 2.3 0 4.5.7 6 2 1.5-1.3 3.7-2 6-2 1 0 2 .1 3 .4V4.9c-1-.3-2-.4-3-.4-2.3 0-4.5.7-6 2Z"/><path d="M12 6.5v13.6"/></svg></div>
             <h3 class="lang-nl">Uitleg</h3>
             <h3 class="lang-en">Guide</h3>
+            <h3 class="lang-fr">Guide</h3>
+            <h3 class="lang-es">Guía</h3>
             <p class="lang-nl">Leer over het schrift, klanken, grammatica en tips.</p>
             <p class="lang-en">Learn about the script, sounds, grammar, and tips.</p>
+            <p class="lang-fr">Découvrez l'écriture, les sons, la grammaire et des astuces.</p>
+            <p class="lang-es">Descubre la escritura, los sonidos, la gramática y consejos.</p>
           </div>
         </div>
       </div>
@@ -1561,21 +1763,33 @@ fbAuth.onAuthStateChanged(user => {
         <div class="tifi voor-wie-tifi">ⵉⵎⴰⵣⵉⵖⵏ</div>
         <h2 class="lang-nl">Voor wie is dit?</h2>
         <h2 class="lang-en">Who is this for?</h2>
+        <h2 class="lang-fr">Pour qui est-ce fait ?</h2>
+        <h2 class="lang-es">¿Para quién es esto?</h2>
         <ul>
           <li class="lang-nl">Kinderen en kleinkinderen van Rifijnse families die de taal willen leren.</li>
           <li class="lang-en">Children and grandchildren of Riffian families who want to learn the language.</li>
+          <li class="lang-fr">Les enfants et petits-enfants de familles rifaines qui veulent apprendre la langue.</li>
+          <li class="lang-es">Hijos y nietos de familias rifeñas que quieren aprender el idioma.</li>
           <li class="lang-nl">Mensen die hun roots willen ontdekken en verbinding zoeken met de cultuur.</li>
           <li class="lang-en">People who want to discover their roots and connect with the culture.</li>
+          <li class="lang-fr">Les personnes qui veulent découvrir leurs racines et renouer avec la culture.</li>
+          <li class="lang-es">Personas que quieren descubrir sus raíces y conectar con la cultura.</li>
           <li class="lang-nl">Iedereen die geïnteresseerd is in Berbertalen en het Tifinagh-schrift.</li>
           <li class="lang-en">Anyone interested in Berber languages and the Tifinagh script.</li>
+          <li class="lang-fr">Toute personne intéressée par les langues berbères et l'écriture Tifinagh.</li>
+          <li class="lang-es">Cualquiera interesado en las lenguas bereberes y la escritura Tifinagh.</li>
           <li class="lang-nl">Beginners zonder voorkennis — alles wordt stap voor stap uitgelegd.</li>
           <li class="lang-en">Beginners with no prior knowledge — everything is explained step by step.</li>
+          <li class="lang-fr">Les débutants sans connaissances préalables — tout est expliqué étape par étape.</li>
+          <li class="lang-es">Principiantes sin conocimientos previos — todo se explica paso a paso.</li>
         </ul>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;text-align:center">
         <div class="tifi" style="font-size:3.5rem;color:var(--cta);margin-bottom:1rem">ⵜⴰⵎⴰⵣⵉⵖⵜ</div>
         <p class="lang-nl" style="color:var(--muted);font-size:.9rem">Het woord "Tamazight" in Tifinagh-schrift</p>
         <p class="lang-en" style="color:var(--muted);font-size:.9rem">The word "Tamazight" in Tifinagh script</p>
+        <p class="lang-fr" style="color:var(--muted);font-size:.9rem">Le mot « Tamazight » en écriture Tifinagh</p>
+        <p class="lang-es" style="color:var(--muted);font-size:.9rem">La palabra "Tamazight" en escritura Tifinagh</p>
       </div>
     </div>
   </div>
@@ -1587,10 +1801,16 @@ fbAuth.onAuthStateChanged(user => {
     <div class="page-header">
       <div class="tag lang-nl">Hoofdstuk 1</div>
       <div class="tag lang-en">Chapter 1</div>
+      <div class="tag lang-fr">Chapitre 1</div>
+      <div class="tag lang-es">Capítulo 1</div>
       <h1 class="lang-nl">Het Tifinagh alfabet</h1>
       <h1 class="lang-en">The Tifinagh alphabet</h1>
+      <h1 class="lang-fr">L'alphabet Tifinagh</h1>
+      <h1 class="lang-es">El alfabeto Tifinagh</h1>
       <p class="lang-nl">Tifinagh is het oude schrift van de Amazigh volkeren. Het moderne Neo-Tifinagh telt 31 tekens.<br>Tik op een letter om de uitspraak en een voorbeeld te zien.</p>
       <p class="lang-en">Tifinagh is the ancient script of the Amazigh peoples. Modern Neo-Tifinagh has 31 characters.<br>Tap a letter to see its pronunciation and an example.</p>
+      <p class="lang-fr">Le Tifinagh est l'écriture ancienne des peuples amazighs. Le néo-Tifinagh moderne compte 31 caractères.<br>Touchez une lettre pour voir sa prononciation et un exemple.</p>
+      <p class="lang-es">El Tifinagh es la escritura antigua de los pueblos amazigh. El neo-Tifinagh moderno tiene 31 caracteres.<br>Toca una letra para ver su pronunciación y un ejemplo.</p>
     </div>
     <div class="abc-layout">
       <div id="abc-grid" class="abc-grid"></div>
@@ -1612,8 +1832,12 @@ fbAuth.onAuthStateChanged(user => {
       <div class="tag">Tarifit · Al Hoceima</div>
       <h1 class="lang-nl">Woorden in Tmazight</h1>
       <h1 class="lang-en">Words in Tamazight</h1>
+      <h1 class="lang-fr">Mots en Tamazight</h1>
+      <h1 class="lang-es">Palabras en Tamazight</h1>
       <p class="lang-nl">Meer dan 100 woorden verdeeld over 11 categorieën. Zoek op Nederlands, Tamazight of Tifinagh.</p>
       <p class="lang-en">Over 100 words spread across 11 categories. Search in English, Tamazight, or Tifinagh.</p>
+      <p class="lang-fr">Plus de 100 mots répartis en 11 catégories. Cherchez en français, tamazight ou tifinagh.</p>
+      <p class="lang-es">Más de 100 palabras repartidas en 11 categorías. Busca en español, tamazight o tifinagh.</p>
     </div>
     <div style="padding-top:1.5rem">
       <div style="margin-top:14px;background:var(--card);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 var(--radius) var(--radius) 0;max-width:640px;font-size:14px;color:var(--muted);line-height:1.8">
@@ -1644,10 +1868,16 @@ fbAuth.onAuthStateChanged(user => {
     <div class="page-header">
       <div class="tag lang-nl">Interactief</div>
       <div class="tag lang-en">Interactive</div>
+      <div class="tag lang-fr">Interactif</div>
+      <div class="tag lang-es">Interactivo</div>
       <h1 class="lang-nl">Oefenen</h1>
       <h1 class="lang-en">Practice</h1>
+      <h1 class="lang-fr">Pratiquer</h1>
+      <h1 class="lang-es">Practicar</h1>
       <p class="lang-nl">Kies een modus en test je kennis van Tarifit-woorden.</p>
       <p class="lang-en">Choose a mode and test your knowledge of Tarifit words.</p>
+      <p class="lang-fr">Choisissez un mode et testez vos connaissances des mots tarifit.</p>
+      <p class="lang-es">Elige un modo y pon a prueba tu conocimiento de palabras tarifit.</p>
     </div>
     <div id="oefenenLocked" class="locked-gate" style="display:none">
       <div class="locked-box">
@@ -1722,15 +1952,21 @@ fbAuth.onAuthStateChanged(user => {
     <div class="page-header">
       <div class="tag lang-nl">Theorie</div>
       <div class="tag lang-en">Theory</div>
+      <div class="tag lang-fr">Théorie</div>
+      <div class="tag lang-es">Teoría</div>
       <h1 class="lang-nl">Hoe werkt Tifinagh?</h1>
       <h1 class="lang-en">How does Tifinagh work?</h1>
+      <h1 class="lang-fr">Comment fonctionne le Tifinagh ?</h1>
+      <h1 class="lang-es">¿Cómo funciona el Tifinagh?</h1>
       <p class="lang-nl">Een korte introductie tot het schrift, de klanken en de grammatica van Tarifit.</p>
       <p class="lang-en">A short introduction to the script, sounds, and grammar of Tarifit.</p>
+      <p class="lang-fr">Une courte introduction à l'écriture, aux sons et à la grammaire du tarifit.</p>
+      <p class="lang-es">Una breve introducción a la escritura, los sonidos y la gramática del tarifit.</p>
     </div>
     <div class="uitleg-layout">
       <article class="uitleg-article lang-nl">
 
-        <details class="uitleg-collapsible" id="s-schrift" open>
+        <details class="uitleg-collapsible" id="s-schrift">
           <summary><h2>Het schrift</h2><span class="uitleg-caret"></span></summary>
           <div class="uitleg-collapsible-body">
           <p>Tifinagh is een van de oudste schriften ter wereld en wordt al duizenden jaren gebruikt door Berberse volkeren in Noord-Afrika. Het moderne Neo-Tifinagh-schrift, zoals gebruikt in Marokko, is gestandaardiseerd door het <strong>IRCAM</strong> (Institut Royal de la Culture Amazighe).</p>
@@ -1874,7 +2110,7 @@ fbAuth.onAuthStateChanged(user => {
 
       <article class="uitleg-article lang-en">
 
-        <details class="uitleg-collapsible" id="s-schrift-en" open>
+        <details class="uitleg-collapsible" id="s-schrift-en">
           <summary><h2>The script</h2><span class="uitleg-caret"></span></summary>
           <div class="uitleg-collapsible-body">
           <p>Tifinagh is one of the oldest scripts in the world and has been used by Berber peoples in North Africa for thousands of years. The modern Neo-Tifinagh script, as used in Morocco, was standardized by <strong>IRCAM</strong> (Institut Royal de la Culture Amazighe).</p>
@@ -2039,6 +2275,9 @@ fbAuth.onAuthStateChanged(user => {
     <div class="ai-sb-logo">
       <div class="ai-sb-logo-icon">ⵣ</div>
       <div class="ai-sb-logo-text">AI Coach<small>Tarifit · Tifinagh</small></div>
+      <button class="ai-sidebar-close" onclick="aiToggleSidebar()" aria-label="Sluiten">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
     <div class="ai-sb-top">
       <button class="ai-sb-newchat" onclick="aiNewChat()">
@@ -2103,10 +2342,16 @@ fbAuth.onAuthStateChanged(user => {
     <div class="page-header">
       <div class="tag lang-nl">Jouw account</div>
       <div class="tag lang-en">Your account</div>
+      <div class="tag lang-fr">Votre compte</div>
+      <div class="tag lang-es">Tu cuenta</div>
       <h1 class="lang-nl">Account</h1>
       <h1 class="lang-en">Account</h1>
+      <h1 class="lang-fr">Compte</h1>
+      <h1 class="lang-es">Cuenta</h1>
       <p class="lang-nl">Beheer je gegevens en wachtwoord.</p>
       <p class="lang-en">Manage your details and password.</p>
+      <p class="lang-fr">Gérez vos informations et votre mot de passe.</p>
+      <p class="lang-es">Gestiona tus datos y contraseña.</p>
     </div>
     <div style="padding-top:1.5rem;max-width:520px">
 
@@ -2164,10 +2409,16 @@ fbAuth.onAuthStateChanged(user => {
     <div class="page-header">
       <div class="tag lang-nl">Support</div>
       <div class="tag lang-en">Support</div>
+      <div class="tag lang-fr">Support</div>
+      <div class="tag lang-es">Soporte</div>
       <h1 class="lang-nl">Hulp &amp; Contact</h1>
       <h1 class="lang-en">Help &amp; Contact</h1>
+      <h1 class="lang-fr">Aide &amp; Contact</h1>
+      <h1 class="lang-es">Ayuda &amp; Contacto</h1>
       <p class="lang-nl">Vragen, feedback of gewoon een berichtje? We horen graag van je.</p>
       <p class="lang-en">Questions, feedback, or just want to say hi? We'd love to hear from you.</p>
+      <p class="lang-fr">Des questions, des retours, ou juste envie de dire bonjour ? Nous serions ravis de vous lire.</p>
+      <p class="lang-es">¿Preguntas, comentarios o simplemente quieres saludar? Nos encantaría saber de ti.</p>
     </div>
 
     <div style="padding-top:1.5rem">
@@ -2229,15 +2480,23 @@ fbAuth.onAuthStateChanged(user => {
         <h3>Tifinaghhub</h3>
         <p class="lang-nl">Een leerplatform voor Tarifit — de taal van het Rif-gebergte.</p>
         <p class="lang-en">A learning platform for Tarifit — the language of the Rif mountains.</p>
+        <p class="lang-fr">Une plateforme d'apprentissage du tarifit — la langue des montagnes du Rif.</p>
+        <p class="lang-es">Una plataforma de aprendizaje del tarifit — la lengua de las montañas del Rif.</p>
         <div class="version-badge">v1.1</div>
         <div class="version-note lang-nl">Nu met account & inloggen</div>
         <div class="version-note lang-en">Now with account & login</div>
+        <div class="version-note lang-fr">Maintenant avec compte & connexion</div>
+        <div class="version-note lang-es">Ahora con cuenta e inicio de sesión</div>
       </div>
       <div class="footer-right" style="display:flex;align-items:center;gap:1.25rem">
         <button class="btn btn-outline lang-nl" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="goPage('contact')">Hulp &amp; Contact</button>
         <button class="btn btn-outline lang-en" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="goPage('contact')">Help &amp; Contact</button>
+        <button class="btn btn-outline lang-fr" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="goPage('contact')">Aide &amp; Contact</button>
+        <button class="btn btn-outline lang-es" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="goPage('contact')">Ayuda &amp; Contacto</button>
         <button class="btn btn-outline lang-nl" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="openFeedback()">Woord voorstellen</button>
         <button class="btn btn-outline lang-en" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="openFeedback()">Suggest a word</button>
+        <button class="btn btn-outline lang-fr" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="openFeedback()">Proposer un mot</button>
+        <button class="btn btn-outline lang-es" style="font-size:.82rem;padding:.5rem 1.1rem" onclick="openFeedback()">Sugerir una palabra</button>
         <span class="tifi">ⵜⴰⵎⴰⵣⵉⵖⵜ</span>
       </div>
     </div>
@@ -2285,155 +2544,155 @@ const ABC = [
 <script>
 /* ===== DATA: WORDS ===== */
 const WORDS = [
-    ['Water','Aman / Emen','ⴰⵎⴰⵏ / ⴻⵎⴻⵏ','Water'],
-    ['Jij (mannelijk)','Shek','ⵛⴻⴽ','You (male)'],
-    ['Jij (vrouwelijk)','Shem','ⵛⴻⵎ','You (female)'],
-    ['Wat kijk je','Min ghza','ⵎⵉⵏ ⵖⵣⴰ','What are you looking at'],
-    ['Wat zie je','Min twariedh','ⵎⵉⵏ ⵜⵡⴰⵔⵉⴷⵃ','What do you see'],
-    ['Wat','Min','ⵎⵉⵏ','What'],
-    ['Brood','Aghrom / Agroum','ⴰⵖⵔⵓⵎ / ⴰⴳⵔⵓⵎ','Bread'],
-    ['Onze voorouders','Rajdod negh','ⵔⴰⵊⴷⵓⴷ ⵏⵖ','Our ancestors'],
-    ['Mama','Yema / Yemma','ⵢⴻⵎⴰ / ⵢⴻⵎⵎⴰ','Mom'],
-    ['Vader','Babac / Aba','ⴱⴰⴱⴰⵛ / ⴰⴱⴰ','Father'],
-    ['Broer','Ouma / Oumah','ⵓⵎⴰ','Brother'],
-    ['Mijn broer','Ayuma ino / Oumah inou','ⴰⵢⵓⵎⴰ ⵉⵏⵓ','My brother'],
-    ['Opa','Jeddi','ⵊⴻⴷⴷⵉ','Grandpa'],
-    ['Oma','Jida','ⵊⵉⴷⴰ','Grandma'],
-    ['Zus','Outchma / Ouchme','ⵓⵜⵛⵎⴰ','Sister'],
-    ['Mijn zus','Ouchme inou','ⵓⵛⵎⴻ ⵉⵏⵓ','My sister'],
-    ['Wat doe je','Min taqid','ⵎⵉⵏ ⵜⴰⵇⵉⴷ','What are you doing'],
-    ['Niks','Wellou','ⵡⴻⵍⵍⵓ','Nothing'],
-    ['Ik leer nog','3ad qaagh','ⵄⴰⴷ ⵇⴰⵖ','I\'m still learning'],
-    ['Ik','Nish','ⵏⵉⵛ','I'],
-    ['Ezel','Aghyour','ⴰⵖⵢⵓⵔ','Donkey'],
-    ['Kip','Tyazid / Jazit','ⵜⵢⴰⵣⵉⴷ / ⵊⴰⵣⵉⵜ','Chicken'],
-    ['Maar','Masha','ⵎⴰⵛⴰ','But'],
-    ['Waarom','Magha','ⵎⴰⴳⵃⴰ','Why'],
-    ['Doe licht uit','Saghsi ttuu','ⵙⴰⵖⵙⵉ ⵜⵜⵓⵓ','Turn off the light'],
-    ['Doe licht aan','Saagh ttuu / M3achar ttuu','ⵙⴰⴰⵖ ⵜⵜⵓⵓ','Turn on the light'],
-    ['Deur','Tawath / Taouat','ⵜⴰⵡⴰⵡⵜ','Door'],
-    ['Open','Aazem','ⴰⴰⵣⴻⵎ','Open'],
-    ['Dicht','Bela3','ⴱⴻⵍⴰⵄ','Closed'],
-    ['Van mij','Inou','ⵉⵏⵓ','Mine'],
-    ['Iedereen','Korchi','ⴽⵓⵍⵛⵉ','Everyone'],
-    ['Weg','Whoudda','ⵡⵀⵓⴷⴷⴰ','Gone / away'],
-    ['Dommerd','Abouhari','ⴰⴱⵓⵀⴰⵔⵉ','Fool'],
-    ['Verrader','Achakam','ⴰⵛⴰⴽⴰⵎ','Traitor'],
-    ['Sorry','Samhay','ⵙⴰⵎⵃⴰⵢ','Sorry'],
-    ['Hoe gaat het','Moeg / Memesh thedjiedh','ⵎⵓⴻⴳ / ⵎⴻⵎⴻⵛ ⵜⵃⴻⴷⵊⵉⴷⵃ','How are you'],
-    ['Wat zeg je','Min tqad','ⵎⵉⵏ ⵜⵇⴰⴷ','What are you saying'],
-    ['Niet verstaan','Oefemagh she mien thendieh','ⵄⵓⴼⴻⵎⴰⵖ ⵛⴻ ⵎⵉⵏ ⵜⵃⴻⵏⴷⵉⴻⵃ','I don\'t understand'],
-    ['Ik heet','Nish kaney','ⵏⵉⵛ ⴽⴰⵏⴻⵢ','My name is'],
-    ['Maan','Ayjoer','ⴰⵢⵊⵓⵔ','Moon'],
-    ['Waar','Mani','ⵎⴰⵏⵉ','Where'],
-    ['Hoe','Memesh / Mougaas','ⵎⴻⵎⴻⵛ','How'],
-    ['Waar kom jij vandaan','Manies shem/shek','ⵎⴰⵏⵉⴻⵙ','Where are you from'],
-    ['Sta op','Qa sennie','ⵇⴰ ⵙⴻⵏⵏⵉⴻ','Stand up'],
-    ['Ga naar huis','Ro7 ataw7edh','ⵔⵓⵃ ⴰⵜⴰⵡⴻⴷⵃ','Go home'],
-    ['Waar is','Manidja','ⵎⴰⵏⵉⴷⵊⴰ','Where is'],
-    ['Waar ben jij','Maydjith','ⵎⴰⵢⴷⵊⵉⵜ','Where are you'],
-    ['Overal','Mani ma','ⵎⴰⵏⵉ ⵎⴰ','Everywhere'],
-    ['Kom hier','Ara7id dha','ⴰⵔⴰⵃⵉⴷ ⴷⴰ','Come here'],
-    ['Hetzelfde','Kief kief','ⴽⵉⴼ ⴽⵉⴼ','Same'],
-    ['Ik haat je','Shahegh shem/shek','ⵛⴰⵀⴻⵖ','I hate you'],
-    ['Ik ben moe','Oe7regh','ⵓⴻⵃⵔⴻⵖ','I\'m tired'],
-    ['Thee','Atay','ⴰⵜⴰⵢ','Tea'],
-    ['Koffie','Kahoua','ⴽⴰⵃⵓⴰ','Coffee'],
-    ['Melk','Eshfey','ⴻⵛⴼⴻⵢ','Milk'],
-    ['Suiker','Soka','ⵙⵓⴽⴰ','Sugar'],
-    ['Appel','Tefeh','ⵜⴻⴼⴻⵃ','Apple'],
-    ['Banaan','Benen','ⴱⴻⵏⴻⵏ','Banana'],
-    ['Aardappel','Batata','ⴱⴰⵜⴰⵜⴰ','Potato'],
-    ['Komkommer','Giar','ⴳⵉⴰⵔ','Cucumber'],
-    ['Ei','Emegadgh','ⴻⵎⴻⴳⴰⴷⵖ','Egg'],
-    ['Nederland','Holanda','ⵀⵓⵍⴰⵏⴷⴰ','The Netherlands'],
-    ['Buitenland','Garish','ⴳⴰⵔⵉⵛ','Abroad'],
-    ['Geld','Tin3ashien','ⵜⵉⵏⵄⴰⵛⵉⴻⵏ','Money'],
-    ['Hoeveel','Meshhar','ⵎⴻⵛⵀⴰⵔ','How much / how many'],
-    ['Hallo','Azul','ⴰⵣⵓⵍ','Hello'],
-    ['Doei','Beslama','ⴱⴻⵙⵍⴰⵎⴰ','Bye'],
-    ['Goed','Mlih','ⵎⵍⵉⵃ','Good'],
-    ['Zon','Fouith','ⴼⵓⵡⵉⵙⵟ','Sun'],
-    ['Regen','Anza','ⴰⵏⵣⴰ','Rain'],
-    ['Telefoon','Tlilifoen','ⵜⵍⵉⵍⵉⴼⵓⴻⵏ','Phone'],
-    ['Auto','Tomowin','ⵜⵓⵎⵓⵡⵉⵏ','Car'],
-    ['School','Medrasa','ⵎⴻⴷⵔⴰⵙⴰ','School'],
-    ['Hond','Akezin','ⴰⴽⴻⵣⵉⵏ','Dog'],
-    ['Kamer','Ogham','ⵓⵖⴰⵎ','Room'],
-    ['Raam','Ouagheft','ⵓⵡⴰⵖⴻⴼⵜ','Window'],
-    ['Tijd','Tsa3ed','ⵜⵙⴰⵄⴻⴷ','Time'],
-    ['Mensen','Iewuthen','ⵉⵡⵓⵡⵜⵀⴻⵏ','People'],
-    ['Vriend','Oumdoeker','ⵓⵎⴷⵓⴻⴽⴻⵔ','Friend (male)'],
-    ['Vriendin','Toumdoekerch','ⵜⵓⵎⴷⵓⴻⴽⴻⵔⵛ','Friend (female)'],
-    ['Hand','Afous','ⴰⴼⵓⵙ','Hand'],
-    ['Met de hand','Soufous','ⵙⵓⴼⵓⵙ','By hand'],
-    ['Hoofd','Ecdjief','ⴻⵛⴷⵊⵉⴻⴼ','Head'],
-    ['Schoen','Hakous','ⵃⴰⴽⵓⵙ','Shoe'],
-    ['Pen / Potlood','Stiloe','ⵙⵜⵉⵍⵓⴻ','Pen / Pencil'],
-    ['Zak','Tashghath','ⵜⴰⵛⵖⴰⵟ','Bag'],
-    ['Vork','Fourshita','ⴼⵓⵔⵛⵉⵜⴰ','Fork'],
-    ['Hemel','Djanna','ⴷⵊⴰⵏⵏⴰ','Sky / Heaven'],
-    ['Winkel','Thanout','ⵜⵃⴰⵏⵓⵜ','Shop'],
-    ['Kussen','Tsoumet','ⵜⵙⵓⵎⴻⵜ','Pillow'],
-    ['Sleutel','Remfeteh','ⵔⴻⵎⴼⴻⵜⴻⵃ','Key'],
-    ['Horloge','Tsa3ed','ⵜⵙⴰⵄⴻⴷ','Watch'],
-    ['Bril','Remratha','ⵔⴻⵎⵔⴰⵝⴰ','Glasses'],
-    ['Toilet','Bitelma','ⴱⵉⵜⴻⵍⵎⴰ','Toilet'],
-    ['Zit','Kim','ⴽⵉⵎ','Sit'],
-    ['1 – één','Wahid','ⵡⴰⵃⵉⴷ','1 – one'],
-    ['2 – twee','Nein','ⵏⴰⵢⵏ','2 – two'],
-    ['3 – drie','Trethe','ⵜⵔⴻⵜⵀⴻ','3 – three'],
-    ['4 – vier','Ab3a','ⴰⴱⵄⴰ','4 – four'],
-    ['5 – vijf','Gemsa','ⴳⴻⵎⵙⴰ','5 – five'],
-    ['6 – zes','Seta','ⵙⴻⵜⴰ','6 – six'],
-    ['7 – zeven','Seb3a','ⵙⴻⴱⵄⴰ','7 – seven'],
-    ['8 – acht','Minja','ⵎⵉⵏⵊⴰ','8 – eight'],
-    ['9 – negen','Ts3a','ⵜⵙⵄⴰ','9 – nine'],
-    ['10 – tien','3ashra','ⵄⴰⵛⵔⴰ','10 – ten'],
-    ['20 – twintig','3ashrien','ⵄⴰⵛⵔⵉⴻⵏ','20 – twenty'],
-    ['30 – dertig','Trathien','ⵜⵔⴰⵜⵀⵉⴻⵏ','30 – thirty'],
-    ['40 – veertig','Ab3ien','ⴰⴱⵄⵉⴻⵏ','40 – forty'],
-    ['50 – vijftig','Gemsien','ⴳⴻⵎⵙⵉⴻⵏ','50 – fifty'],
-    ['60 – zestig','Setien','ⵙⴻⵜⵉⴻⵏ','60 – sixty'],
-    ['70 – zeventig','Seb3ien','ⵙⴻⴱⵄⵉⴻⵏ','70 – seventy'],
-    ['Dorp','Tudrint','ⵜⵓⴷⵔⵉⵏⵜ','Village'],
-    ['Weg (straat)','Abrid','ⴰⴱⵔⵉⴷ','Road (street)'],
-    ['Vlees','Aksum','ⴰⴽⵙⵓⵎ','Meat'],
-    ['Vis','Isermen','ⵉⵙⴻⵔⵎⴻⵏ','Fish'],
-    ['Zout','remreh','ⵔⴻⵎⵔⴻ','Salt'],
-    ['Olie','ziedh','ⵣⵉⴻⴷⵀ','Oil'],
-    ['Honing','Tament','ⵜⴰⵎⴻⵏⵜ','Honey'],
-    ['Oog','Titaouin','ⵜⵉⵜⴰⵡⵉⵏ','Eye'],
-    ['Oren','Imzogan','ⵉⵎⵣⵓⴳⴰⵏ','Ears'],
-    ['Mond','akemom','ⴰⴽⴻⵎⵓⵎ','Mouth'],
-    ['Neus','Anza','ⴰⵏⵣⴰ','Nose'],
-    ['Rijst','Aroz','ⴰⵔⵓⵣ','Rice'],
-    ['Soep','ta7reth','ⵜⴰ7ⵔⴻⵜ','Soup'],
-    ['Boter','Zbdah','ⵣⴱⴷⴰⵀ','Butter'],
-    ['Pittig','tkes','ⵜⴽⴻⵙ','Spicy'],
-    ['Ui','tabsedch','ⵜⴰⴱⵙⴻⴷⵛⵀ','Onion'],
-    ['Tomaat','tomatish','ⵜⵓⵎⴰⵟⵉⵛ','Tomato'],
-    ['Wortel','Khizou','ⵅⵉⵣⵓ','Carrot'],
-    ['Sinaasappel','lechien','ⵍⴻⵛⵀⵉⵏ','Orange'],
-    ['Tand','tighmas','ⵜⵉⵖⵎⴰⵙ','Tooth'],
-    ['Voet','iedhaan','ⴻⴷⵀⴰⵏ','Foot'],
-    ['Kijken','gza','ⴳⵣⴰ','To look'],
-    ['Luisteren','sennat','ⵙⴻⵏⴰⵜ','To listen'],
-    ['Schrijven','Ari','ⴰⵔⵉ','To write'],
-    ['Komen','awa7','awa7','To come'],
-    ['Vinden','tafieth','ⵜⴰⴼⵉⵢⵜ','To find'],
-    ['Lang','Azegra','ⴰⵣⴻⴳⵔⴰ','Long / tall'],
-    ['Kort','Amezzyan','ⴰⵎⴻⵣⵣⵢⴰⵏ','Short'],
-    ['Koud','tasemadh','tasemadh','Cold'],
-    ['Nieuw','deshdieth','ⴷⵉⵙⴷⵉⵜ','New'],
-    ['Huis','tadath','ⵜⴰⴷⴰⵜ','House'],
-    ['Schoolplein','medrasa','ⵎⴻⴷⵔⴰⵙⴰ','Schoolyard'],
-    ['Apotheek','Farmasia','ⴼⴰⵔⵎⴰⵙⵢⴰ','Pharmacy'],
-    ['Naam','Isem','ⵉⵙⴻⵎ','Name'],
-    ['Werk','rgedmeth','ⵔⴳⴻⴷⵎⴻⵜⵀ','Work'],
-    ['Vragen','seqse','ⵙⴻⵇⵙⴻ','To ask'],
-    ['Probleem','Mushkil','ⵎⵓⵛⴽⵉⵍ','Problem'],
-    ['Steen','Azrou','ⴰⵣⵔⵓ','Stone'],
+    ['Water','Aman / Emen','ⴰⵎⴰⵏ / ⴻⵎⴻⵏ','Water','Eau','Agua'],
+    ['Jij (mannelijk)','Shek','ⵛⴻⴽ','You (male)','Toi (masculin)','Tú (masculino)'],
+    ['Jij (vrouwelijk)','Shem','ⵛⴻⵎ','You (female)','Toi (féminin)','Tú (femenino)'],
+    ['Wat kijk je','Min ghza','ⵎⵉⵏ ⵖⵣⴰ','What are you looking at','Que regardes-tu','Qué estás mirando'],
+    ['Wat zie je','Min twariedh','ⵎⵉⵏ ⵜⵡⴰⵔⵉⴷⵃ','What do you see','Que vois-tu','Qué ves'],
+    ['Wat','Min','ⵎⵉⵏ','What','Quoi','Qué'],
+    ['Brood','Aghrom / Agroum','ⴰⵖⵔⵓⵎ / ⴰⴳⵔⵓⵎ','Bread','Pain','Pan'],
+    ['Onze voorouders','Rajdod negh','ⵔⴰⵊⴷⵓⴷ ⵏⵖ','Our ancestors','Nos ancêtres','Nuestros antepasados'],
+    ['Mama','Yema / Yemma','ⵢⴻⵎⴰ / ⵢⴻⵎⵎⴰ','Mom','Maman','Mamá'],
+    ['Vader','Babac / Aba','ⴱⴰⴱⴰⵛ / ⴰⴱⴰ','Father','Père','Padre'],
+    ['Broer','Ouma / Oumah','ⵓⵎⴰ','Brother','Frère','Hermano'],
+    ['Mijn broer','Ayuma ino / Oumah inou','ⴰⵢⵓⵎⴰ ⵉⵏⵓ','My brother','Mon frère','Mi hermano'],
+    ['Opa','Jeddi','ⵊⴻⴷⴷⵉ','Grandpa','Grand-père','Abuelo'],
+    ['Oma','Jida','ⵊⵉⴷⴰ','Grandma','Grand-mère','Abuela'],
+    ['Zus','Outchma / Ouchme','ⵓⵜⵛⵎⴰ','Sister','Sœur','Hermana'],
+    ['Mijn zus','Ouchme inou','ⵓⵛⵎⴻ ⵉⵏⵓ','My sister','Ma sœur','Mi hermana'],
+    ['Wat doe je','Min taqid','ⵎⵉⵏ ⵜⴰⵇⵉⴷ','What are you doing','Que fais-tu','Qué estás haciendo'],
+    ['Niks','Wellou','ⵡⴻⵍⵍⵓ','Nothing','Rien','Nada'],
+    ['Ik leer nog','3ad qaagh','ⵄⴰⴷ ⵇⴰⵖ','I\'m still learning','J\'apprends encore','Todavía estoy aprendiendo'],
+    ['Ik','Nish','ⵏⵉⵛ','I','Je','Yo'],
+    ['Ezel','Aghyour','ⴰⵖⵢⵓⵔ','Donkey','Âne','Burro'],
+    ['Kip','Tyazid / Jazit','ⵜⵢⴰⵣⵉⴷ / ⵊⴰⵣⵉⵜ','Chicken','Poulet','Pollo'],
+    ['Maar','Masha','ⵎⴰⵛⴰ','But','Mais','Pero'],
+    ['Waarom','Magha','ⵎⴰⴳⵃⴰ','Why','Pourquoi','Por qué'],
+    ['Doe licht uit','Saghsi ttuu','ⵙⴰⵖⵙⵉ ⵜⵜⵓⵓ','Turn off the light','Éteins la lumière','Apaga la luz'],
+    ['Doe licht aan','Saagh ttuu / M3achar ttuu','ⵙⴰⴰⵖ ⵜⵜⵓⵓ','Turn on the light','Allume la lumière','Enciende la luz'],
+    ['Deur','Tawath / Taouat','ⵜⴰⵡⴰⵡⵜ','Door','Porte','Puerta'],
+    ['Open','Aazem','ⴰⴰⵣⴻⵎ','Open','Ouvert','Abierto'],
+    ['Dicht','Bela3','ⴱⴻⵍⴰⵄ','Closed','Fermé','Cerrado'],
+    ['Van mij','Inou','ⵉⵏⵓ','Mine','À moi','Mío'],
+    ['Iedereen','Korchi','ⴽⵓⵍⵛⵉ','Everyone','Tout le monde','Todos'],
+    ['Weg','Whoudda','ⵡⵀⵓⴷⴷⴰ','Gone / away','Parti','Fuera'],
+    ['Dommerd','Abouhari','ⴰⴱⵓⵀⴰⵔⵉ','Fool','Idiot','Tonto'],
+    ['Verrader','Achakam','ⴰⵛⴰⴽⴰⵎ','Traitor','Traître','Traidor'],
+    ['Sorry','Samhay','ⵙⴰⵎⵃⴰⵢ','Sorry','Désolé','Perdón'],
+    ['Hoe gaat het','Moeg / Memesh thedjiedh','ⵎⵓⴻⴳ / ⵎⴻⵎⴻⵛ ⵜⵃⴻⴷⵊⵉⴷⵃ','How are you','Comment ça va','Cómo estás'],
+    ['Wat zeg je','Min tqad','ⵎⵉⵏ ⵜⵇⴰⴷ','What are you saying','Que dis-tu','Qué dices'],
+    ['Niet verstaan','Oefemagh she mien thendieh','ⵄⵓⴼⴻⵎⴰⵖ ⵛⴻ ⵎⵉⵏ ⵜⵃⴻⵏⴷⵉⴻⵃ','I don\'t understand','Je ne comprends pas','No entiendo'],
+    ['Ik heet','Nish kaney','ⵏⵉⵛ ⴽⴰⵏⴻⵢ','My name is','Je m\'appelle','Me llamo'],
+    ['Maan','Ayjoer','ⴰⵢⵊⵓⵔ','Moon','Lune','Luna'],
+    ['Waar','Mani','ⵎⴰⵏⵉ','Where','Où','Dónde'],
+    ['Hoe','Memesh / Mougaas','ⵎⴻⵎⴻⵛ','How','Comment','Cómo'],
+    ['Waar kom jij vandaan','Manies shem/shek','ⵎⴰⵏⵉⴻⵙ','Where are you from','D\'où viens-tu','De dónde eres'],
+    ['Sta op','Qa sennie','ⵇⴰ ⵙⴻⵏⵏⵉⴻ','Stand up','Lève-toi','Levántate'],
+    ['Ga naar huis','Ro7 ataw7edh','ⵔⵓⵃ ⴰⵜⴰⵡⴻⴷⵃ','Go home','Rentre à la maison','Ve a casa'],
+    ['Waar is','Manidja','ⵎⴰⵏⵉⴷⵊⴰ','Where is','Où est','Dónde está'],
+    ['Waar ben jij','Maydjith','ⵎⴰⵢⴷⵊⵉⵜ','Where are you','Où es-tu','Dónde estás'],
+    ['Overal','Mani ma','ⵎⴰⵏⵉ ⵎⴰ','Everywhere','Partout','En todas partes'],
+    ['Kom hier','Ara7id dha','ⴰⵔⴰⵃⵉⴷ ⴷⴰ','Come here','Viens ici','Ven aquí'],
+    ['Hetzelfde','Kief kief','ⴽⵉⴼ ⴽⵉⴼ','Same','Pareil','Lo mismo'],
+    ['Ik haat je','Shahegh shem/shek','ⵛⴰⵀⴻⵖ','I hate you','Je te déteste','Te odio'],
+    ['Ik ben moe','Oe7regh','ⵓⴻⵃⵔⴻⵖ','I\'m tired','Je suis fatigué','Estoy cansado'],
+    ['Thee','Atay','ⴰⵜⴰⵢ','Tea','Thé','Té'],
+    ['Koffie','Kahoua','ⴽⴰⵃⵓⴰ','Coffee','Café','Café'],
+    ['Melk','Eshfey','ⴻⵛⴼⴻⵢ','Milk','Lait','Leche'],
+    ['Suiker','Soka','ⵙⵓⴽⴰ','Sugar','Sucre','Azúcar'],
+    ['Appel','Tefeh','ⵜⴻⴼⴻⵃ','Apple','Pomme','Manzana'],
+    ['Banaan','Benen','ⴱⴻⵏⴻⵏ','Banana','Banane','Plátano'],
+    ['Aardappel','Batata','ⴱⴰⵜⴰⵜⴰ','Potato','Pomme de terre','Patata'],
+    ['Komkommer','Giar','ⴳⵉⴰⵔ','Cucumber','Concombre','Pepino'],
+    ['Ei','Emegadgh','ⴻⵎⴻⴳⴰⴷⵖ','Egg','Œuf','Huevo'],
+    ['Nederland','Holanda','ⵀⵓⵍⴰⵏⴷⴰ','The Netherlands','Pays-Bas','Países Bajos'],
+    ['Buitenland','Garish','ⴳⴰⵔⵉⵛ','Abroad','Étranger','Extranjero'],
+    ['Geld','Tin3ashien','ⵜⵉⵏⵄⴰⵛⵉⴻⵏ','Money','Argent','Dinero'],
+    ['Hoeveel','Meshhar','ⵎⴻⵛⵀⴰⵔ','How much / how many','Combien','Cuánto'],
+    ['Hallo','Azul','ⴰⵣⵓⵍ','Hello','Bonjour','Hola'],
+    ['Doei','Beslama','ⴱⴻⵙⵍⴰⵎⴰ','Bye','Salut','Adiós'],
+    ['Goed','Mlih','ⵎⵍⵉⵃ','Good','Bien','Bien'],
+    ['Zon','Fouith','ⴼⵓⵡⵉⵙⵟ','Sun','Soleil','Sol'],
+    ['Regen','Anza','ⴰⵏⵣⴰ','Rain','Pluie','Lluvia'],
+    ['Telefoon','Tlilifoen','ⵜⵍⵉⵍⵉⴼⵓⴻⵏ','Phone','Téléphone','Teléfono'],
+    ['Auto','Tomowin','ⵜⵓⵎⵓⵡⵉⵏ','Car','Voiture','Coche'],
+    ['School','Medrasa','ⵎⴻⴷⵔⴰⵙⴰ','School','École','Escuela'],
+    ['Hond','Akezin','ⴰⴽⴻⵣⵉⵏ','Dog','Chien','Perro'],
+    ['Kamer','Ogham','ⵓⵖⴰⵎ','Room','Chambre','Habitación'],
+    ['Raam','Ouagheft','ⵓⵡⴰⵖⴻⴼⵜ','Window','Fenêtre','Ventana'],
+    ['Tijd','Tsa3ed','ⵜⵙⴰⵄⴻⴷ','Time','Temps','Tiempo'],
+    ['Mensen','Iewuthen','ⵉⵡⵓⵡⵜⵀⴻⵏ','People','Gens','Gente'],
+    ['Vriend','Oumdoeker','ⵓⵎⴷⵓⴻⴽⴻⵔ','Friend (male)','Ami','Amigo'],
+    ['Vriendin','Toumdoekerch','ⵜⵓⵎⴷⵓⴻⴽⴻⵔⵛ','Friend (female)','Amie','Amiga'],
+    ['Hand','Afous','ⴰⴼⵓⵙ','Hand','Main','Mano'],
+    ['Met de hand','Soufous','ⵙⵓⴼⵓⵙ','By hand','À la main','A mano'],
+    ['Hoofd','Ecdjief','ⴻⵛⴷⵊⵉⴻⴼ','Head','Tête','Cabeza'],
+    ['Schoen','Hakous','ⵃⴰⴽⵓⵙ','Shoe','Chaussure','Zapato'],
+    ['Pen / Potlood','Stiloe','ⵙⵜⵉⵍⵓⴻ','Pen / Pencil','Stylo / Crayon','Bolígrafo / Lápiz'],
+    ['Zak','Tashghath','ⵜⴰⵛⵖⴰⵟ','Bag','Sac','Bolsa'],
+    ['Vork','Fourshita','ⴼⵓⵔⵛⵉⵜⴰ','Fork','Fourchette','Tenedor'],
+    ['Hemel','Djanna','ⴷⵊⴰⵏⵏⴰ','Sky / Heaven','Ciel','Cielo'],
+    ['Winkel','Thanout','ⵜⵃⴰⵏⵓⵜ','Shop','Magasin','Tienda'],
+    ['Kussen','Tsoumet','ⵜⵙⵓⵎⴻⵜ','Pillow','Oreiller','Almohada'],
+    ['Sleutel','Remfeteh','ⵔⴻⵎⴼⴻⵜⴻⵃ','Key','Clé','Llave'],
+    ['Horloge','Tsa3ed','ⵜⵙⴰⵄⴻⴷ','Watch','Montre','Reloj'],
+    ['Bril','Remratha','ⵔⴻⵎⵔⴰⵝⴰ','Glasses','Lunettes','Gafas'],
+    ['Toilet','Bitelma','ⴱⵉⵜⴻⵍⵎⴰ','Toilet','Toilettes','Baño'],
+    ['Zit','Kim','ⴽⵉⵎ','Sit','Assieds-toi','Siéntate'],
+    ['1 – één','Wahid','ⵡⴰⵃⵉⴷ','1 – one','1 – un','1 – uno'],
+    ['2 – twee','Nein','ⵏⴰⵢⵏ','2 – two','2 – deux','2 – dos'],
+    ['3 – drie','Trethe','ⵜⵔⴻⵜⵀⴻ','3 – three','3 – trois','3 – tres'],
+    ['4 – vier','Ab3a','ⴰⴱⵄⴰ','4 – four','4 – quatre','4 – cuatro'],
+    ['5 – vijf','Gemsa','ⴳⴻⵎⵙⴰ','5 – five','5 – cinq','5 – cinco'],
+    ['6 – zes','Seta','ⵙⴻⵜⴰ','6 – six','6 – six','6 – seis'],
+    ['7 – zeven','Seb3a','ⵙⴻⴱⵄⴰ','7 – seven','7 – sept','7 – siete'],
+    ['8 – acht','Minja','ⵎⵉⵏⵊⴰ','8 – eight','8 – huit','8 – ocho'],
+    ['9 – negen','Ts3a','ⵜⵙⵄⴰ','9 – nine','9 – neuf','9 – nueve'],
+    ['10 – tien','3ashra','ⵄⴰⵛⵔⴰ','10 – ten','10 – dix','10 – diez'],
+    ['20 – twintig','3ashrien','ⵄⴰⵛⵔⵉⴻⵏ','20 – twenty','20 – vingt','20 – veinte'],
+    ['30 – dertig','Trathien','ⵜⵔⴰⵜⵀⵉⴻⵏ','30 – thirty','30 – trente','30 – treinta'],
+    ['40 – veertig','Ab3ien','ⴰⴱⵄⵉⴻⵏ','40 – forty','40 – quarante','40 – cuarenta'],
+    ['50 – vijftig','Gemsien','ⴳⴻⵎⵙⵉⴻⵏ','50 – fifty','50 – cinquante','50 – cincuenta'],
+    ['60 – zestig','Setien','ⵙⴻⵜⵉⴻⵏ','60 – sixty','60 – soixante','60 – sesenta'],
+    ['70 – zeventig','Seb3ien','ⵙⴻⴱⵄⵉⴻⵏ','70 – seventy','70 – soixante-dix','70 – setenta'],
+    ['Dorp','Tudrint','ⵜⵓⴷⵔⵉⵏⵜ','Village','Village','Pueblo'],
+    ['Weg (straat)','Abrid','ⴰⴱⵔⵉⴷ','Road (street)','Route (rue)','Camino (calle)'],
+    ['Vlees','Aksum','ⴰⴽⵙⵓⵎ','Meat','Viande','Carne'],
+    ['Vis','Isermen','ⵉⵙⴻⵔⵎⴻⵏ','Fish','Poisson','Pescado'],
+    ['Zout','remreh','ⵔⴻⵎⵔⴻ','Salt','Sel','Sal'],
+    ['Olie','ziedh','ⵣⵉⴻⴷⵀ','Oil','Huile','Aceite'],
+    ['Honing','Tament','ⵜⴰⵎⴻⵏⵜ','Honey','Miel','Miel'],
+    ['Oog','Titaouin','ⵜⵉⵜⴰⵡⵉⵏ','Eye','Œil','Ojo'],
+    ['Oren','Imzogan','ⵉⵎⵣⵓⴳⴰⵏ','Ears','Oreilles','Orejas'],
+    ['Mond','akemom','ⴰⴽⴻⵎⵓⵎ','Mouth','Bouche','Boca'],
+    ['Neus','Anza','ⴰⵏⵣⴰ','Nose','Nez','Nariz'],
+    ['Rijst','Aroz','ⴰⵔⵓⵣ','Rice','Riz','Arroz'],
+    ['Soep','ta7reth','ⵜⴰ7ⵔⴻⵜ','Soup','Soupe','Sopa'],
+    ['Boter','Zbdah','ⵣⴱⴷⴰⵀ','Butter','Beurre','Mantequilla'],
+    ['Pittig','tkes','ⵜⴽⴻⵙ','Spicy','Épicé','Picante'],
+    ['Ui','tabsedch','ⵜⴰⴱⵙⴻⴷⵛⵀ','Onion','Oignon','Cebolla'],
+    ['Tomaat','tomatish','ⵜⵓⵎⴰⵟⵉⵛ','Tomato','Tomate','Tomate'],
+    ['Wortel','Khizou','ⵅⵉⵣⵓ','Carrot','Carotte','Zanahoria'],
+    ['Sinaasappel','lechien','ⵍⴻⵛⵀⵉⵏ','Orange','Orange','Naranja'],
+    ['Tand','tighmas','ⵜⵉⵖⵎⴰⵙ','Tooth','Dent','Diente'],
+    ['Voet','iedhaan','ⴻⴷⵀⴰⵏ','Foot','Pied','Pie'],
+    ['Kijken','gza','ⴳⵣⴰ','To look','Regarder','Mirar'],
+    ['Luisteren','sennat','ⵙⴻⵏⴰⵜ','To listen','Écouter','Escuchar'],
+    ['Schrijven','Ari','ⴰⵔⵉ','To write','Écrire','Escribir'],
+    ['Komen','awa7','awa7','To come','Venir','Venir'],
+    ['Vinden','tafieth','ⵜⴰⴼⵉⵢⵜ','To find','Trouver','Encontrar'],
+    ['Lang','Azegra','ⴰⵣⴻⴳⵔⴰ','Long / tall','Long / grand','Largo / alto'],
+    ['Kort','Amezzyan','ⴰⵎⴻⵣⵣⵢⴰⵏ','Short','Court','Corto'],
+    ['Koud','tasemadh','tasemadh','Cold','Froid','Frío'],
+    ['Nieuw','deshdieth','ⴷⵉⵙⴷⵉⵜ','New','Nouveau','Nuevo'],
+    ['Huis','tadath','ⵜⴰⴷⴰⵜ','House','Maison','Casa'],
+    ['Schoolplein','medrasa','ⵎⴻⴷⵔⴰⵙⴰ','Schoolyard','Cour d\'école','Patio del colegio'],
+    ['Apotheek','Farmasia','ⴼⴰⵔⵎⴰⵙⵢⴰ','Pharmacy','Pharmacie','Farmacia'],
+    ['Naam','Isem','ⵉⵙⴻⵎ','Name','Nom','Nombre'],
+    ['Werk','rgedmeth','ⵔⴳⴻⴷⵎⴻⵜⵀ','Work','Travail','Trabajo'],
+    ['Vragen','seqse','ⵙⴻⵇⵙⴻ','To ask','Demander','Preguntar'],
+    ['Probleem','Mushkil','ⵎⵓⵛⴽⵉⵍ','Problem','Problème','Problema'],
+    ['Steen','Azrou','ⴰⵣⵔⵓ','Stone','Pierre','Piedra'],
 ];
 
 // WORDS is a flat array
@@ -2587,7 +2846,7 @@ function selectLetter(i) {
   renderAD(ABC[i]);
 }
 
-function curLang() { return document.documentElement.getAttribute('lang') === 'en' ? 'en' : 'nl'; }
+function curLang() { const l = document.documentElement.getAttribute('lang'); return ['nl','en','fr','es'].includes(l) ? l : 'nl'; }
 
 function renderAD(ltr) {
   const panel = document.getElementById('detail-panel');
@@ -2613,9 +2872,13 @@ let allWords = [];
 function buildW() {
   setTimeout(() => {
     allWords = [];
-    WORDS.forEach(r => allWords.push({nl: r[0], tam: r[1], tifi: r[2], en: r[3] || r[0]}));
+    WORDS.forEach(r => allWords.push({nl: r[0], tam: r[1], tifi: r[2], en: r[3] || r[0], fr: r[4] || r[3] || r[0], es: r[5] || r[3] || r[0]}));
     renderW(allWords);
   }, 0);
+}
+
+function wordGloss(w, lang) {
+  return lang === 'en' ? w.en : lang === 'fr' ? w.fr : lang === 'es' ? w.es : w.nl;
 }
 
 function filterW() {
@@ -2624,6 +2887,8 @@ function filterW() {
   renderW(allWords.filter(w =>
     w.nl.toLowerCase().includes(q) ||
     w.en.toLowerCase().includes(q) ||
+    w.fr.toLowerCase().includes(q) ||
+    w.es.toLowerCase().includes(q) ||
     w.tam.toLowerCase().includes(q) ||
     w.tifi.includes(q)
   ));
@@ -2634,12 +2899,13 @@ function renderW(data) {
   if (!container) return;
   const lang = curLang();
   if (!data.length) {
-    container.innerHTML = '<div class="no-results">' + (lang === 'en' ? 'No words found.' : 'Geen woorden gevonden.') + '</div>';
+    container.innerHTML = '<div class="no-results">' + tr4(lang,'Geen woorden gevonden.','No words found.','Aucun mot trouvé.','No se encontraron palabras.') + '</div>';
     return;
   }
-  let html = '<table class="words-table"><thead><tr><th>' + (lang === 'en' ? 'English' : 'Nederlands') + '</th><th>Tamazight</th><th>Tifinagh</th></tr></thead><tbody>';
+  const colLabel = tr4(lang,'Nederlands','English','Français','Español');
+  let html = '<table class="words-table"><thead><tr><th>' + colLabel + '</th><th>Tamazight</th><th>Tifinagh</th></tr></thead><tbody>';
   data.forEach(w => {
-    html += '<tr><td>' + esc(lang === 'en' ? w.en : w.nl) + '</td><td>' + esc(w.tam) + '</td><td class="tifi">' + esc(w.tifi) + '</td></tr>';
+    html += '<tr><td>' + esc(wordGloss(w, lang)) + '</td><td>' + esc(w.tam) + '</td><td class="tifi">' + esc(w.tifi) + '</td></tr>';
   });
   html += '</tbody></table>';
   container.innerHTML = html;
@@ -3339,8 +3605,8 @@ function aiAnswer(q) {
       letters.slice(0,3).forEach(r=>{html+=letterCard(r.ltr);});
     }
     html += lang==='en'
-      ? '<br><span style="color:var(--muted);font-size:.82rem">Missing something? Send a message via the Words tab.</span>'
-      : '<br><span style="color:var(--muted);font-size:.82rem">Staat het er niet bij? Stuur een bericht via de Woorden-tab.</span>';
+      ? '<br><span style="color:var(--muted);font-size:.82rem">Missing something? Use the \'Suggest a word\' button at the bottom of the site.</span>'
+      : '<br><span style="color:var(--muted);font-size:.82rem">Staat het er niet bij? Gebruik de knop \'Woord voorstellen\' onderaan de site.</span>';
     aiAddMsg('bot',html);
   },700);
 }
@@ -3432,6 +3698,7 @@ function submitFeedback() {
     if (data.success) {
       document.getElementById('fbForm').style.display = 'none';
       document.getElementById('fbSuccess').style.display = 'block';
+      sendThankYouEmail(email, '', lang, 'wordSuggestion');
     } else {
       throw new Error(data.message || 'Onbekende fout');
     }
@@ -3473,6 +3740,21 @@ function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   try { localStorage.setItem('tfh-theme', t); } catch(e){}
 }
+function toggleMobileNav(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('mobileNavDropdown');
+  if (!dd) return;
+  dd.classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('mobileNavDropdown');
+  const btn = document.getElementById('mobileMenuBtn');
+  if (!dd || !dd.classList.contains('open')) return;
+  if (!dd.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
 function toggleTheme() {
   const cur = document.documentElement.getAttribute('data-theme');
   applyTheme(cur === 'light' ? 'dark' : 'light');
@@ -3480,7 +3762,9 @@ function toggleTheme() {
 function applyLang(l) {
   document.documentElement.setAttribute('lang', l);
   const btn = document.getElementById('langBtnLabel');
-  if (btn) btn.textContent = (l === 'nl') ? 'EN' : 'NL';
+  if (btn) btn.textContent = l.toUpperCase();
+  const authBtn = document.getElementById('authLangBtnLabel');
+  if (authBtn) authBtn.textContent = l.toUpperCase();
   try { localStorage.setItem('tfh-lang', l); } catch(e){}
   // Herbouw dynamische content (alfabet, woorden, ai-welkom) in de juiste taal
   if (typeof buildAShow === 'function') buildAShow();
@@ -3489,20 +3773,39 @@ function applyLang(l) {
   if (typeof rerenderQuiz === 'function') rerenderQuiz();
   if (typeof aiRefreshLangUI === 'function') aiRefreshLangUI();
 }
-function toggleLang() {
-  const cur = document.documentElement.getAttribute('lang');
-  applyLang(cur === 'nl' ? 'en' : 'nl');
+const LANG_CYCLE = ['nl', 'en', 'fr', 'es'];
+function closeLangMenus() {
+  document.querySelectorAll('.lang-dropdown').forEach(dd => dd.classList.remove('open'));
 }
+function toggleLangMenu(e, id) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById(id);
+  if (!dd) return;
+  const willOpen = !dd.classList.contains('open');
+  closeLangMenus();
+  if (willOpen) dd.classList.add('open');
+}
+document.addEventListener('click', function(e) {
+  document.querySelectorAll('.lang-dropdown.open').forEach(dd => {
+    const btn = dd.previousElementSibling;
+    if (!dd.contains(e.target) && e.target !== btn && !(btn && btn.contains(e.target))) {
+      dd.classList.remove('open');
+    }
+  });
+});
 (function initThemeLang(){
   let savedTheme = 'dark', savedLang = 'nl';
   try {
     savedTheme = localStorage.getItem('tfh-theme') || 'dark';
     savedLang = localStorage.getItem('tfh-lang') || 'nl';
   } catch(e){}
+  if (LANG_CYCLE.indexOf(savedLang) === -1) savedLang = 'nl';
   document.documentElement.setAttribute('data-theme', savedTheme);
   document.documentElement.setAttribute('lang', savedLang);
   const btn = document.getElementById('langBtnLabel');
-  if (btn) btn.textContent = (savedLang === 'nl') ? 'EN' : 'NL';
+  if (btn) btn.textContent = savedLang.toUpperCase();
+  const authBtn = document.getElementById('authLangBtnLabel');
+  if (authBtn) authBtn.textContent = savedLang.toUpperCase();
 })();
 
 /* ===== INIT ===== */
