@@ -1311,6 +1311,8 @@ textarea.fb-input{resize:vertical;min-height:80px}
   <div class="feedback-modal" style="max-width:520px;max-height:80vh;overflow-y:auto">
     <h3 class="lang-nl">Gebruiksvoorwaarden</h3>
     <h3 class="lang-en">Terms of use</h3>
+    <h3 class="lang-fr">Conditions d'utilisation</h3>
+    <h3 class="lang-es">Términos de uso</h3>
     <div class="lang-nl" style="color:var(--muted);font-size:.88rem;line-height:1.7">
       <p>Door een account aan te maken op Tifinaghhub ga je akkoord met het volgende:</p>
       <p>1. Je gebruikt de site voor persoonlijke, educatieve doeleinden.</p>
@@ -1325,9 +1327,25 @@ textarea.fb-input{resize:vertical;min-height:80px}
       <p>3. You are responsible for keeping your password confidential.</p>
       <p>4. Tifinaghhub may modify or discontinue the service at any time.</p>
     </div>
+    <div class="lang-fr" style="color:var(--muted);font-size:.88rem;line-height:1.7">
+      <p>En créant un compte sur Tifinaghhub, vous acceptez ce qui suit :</p>
+      <p>1. Vous utilisez le site à des fins personnelles et éducatives.</p>
+      <p>2. Vos données (nom, e-mail, date de naissance) servent uniquement à gérer votre compte et ne sont pas partagées avec des tiers.</p>
+      <p>3. Vous êtes responsable de la confidentialité de votre mot de passe.</p>
+      <p>4. Tifinaghhub peut modifier ou interrompre le service à tout moment.</p>
+    </div>
+    <div class="lang-es" style="color:var(--muted);font-size:.88rem;line-height:1.7">
+      <p>Al crear una cuenta en Tifinaghhub, aceptas lo siguiente:</p>
+      <p>1. Usas el sitio con fines personales y educativos.</p>
+      <p>2. Tus datos (nombre, correo, fecha de nacimiento) se usan únicamente para gestionar tu cuenta y no se comparten con terceros.</p>
+      <p>3. Eres responsable de mantener tu contraseña en secreto.</p>
+      <p>4. Tifinaghhub puede modificar o interrumpir el servicio en cualquier momento.</p>
+    </div>
     <div class="fb-row">
       <button class="fb-submit lang-nl" onclick="closeTerms()">Sluiten</button>
       <button class="fb-submit lang-en" onclick="closeTerms()">Close</button>
+      <button class="fb-submit lang-fr" onclick="closeTerms()">Fermer</button>
+      <button class="fb-submit lang-es" onclick="closeTerms()">Cerrar</button>
     </div>
   </div>
 </div>
@@ -1530,7 +1548,7 @@ function accountSaveProfile() {
 
   if (!firstName || !lastName) {
     const m = document.getElementById('acProfileMsg');
-    m.textContent = lang === 'en' ? 'Please fill in your first and last name.' : 'Vul je voor- en achternaam in.';
+    m.textContent = tr4(lang,'Vul je voor- en achternaam in.','Please fill in your first and last name.','Veuillez indiquer votre prénom et votre nom.','Rellena tu nombre y apellido.');
     m.style.display = 'block';
     return;
   }
@@ -1539,12 +1557,12 @@ function accountSaveProfile() {
     .then(() => user.updateProfile({ displayName: firstName + ' ' + lastName }))
     .then(() => {
       const ok = document.getElementById('acProfileOk');
-      ok.textContent = lang === 'en' ? 'Saved!' : 'Opgeslagen!';
+      ok.textContent = tr4(lang,'Opgeslagen!','Saved!','Enregistré !','¡Guardado!');
       ok.style.display = 'block';
     })
     .catch(() => {
       const m = document.getElementById('acProfileMsg');
-      m.textContent = lang === 'en' ? 'Something went wrong saving your details.' : 'Er ging iets mis bij het opslaan.';
+      m.textContent = tr4(lang,'Er ging iets mis bij het opslaan.','Something went wrong saving your details.','Une erreur est survenue lors de l\'enregistrement.','Algo salió mal al guardar tus datos.');
       m.style.display = 'block';
     });
 }
@@ -1560,13 +1578,13 @@ function accountChangePassword() {
 
   if (!current || !next) {
     const m = document.getElementById('acPassMsg');
-    m.textContent = lang === 'en' ? 'Fill in both password fields.' : 'Vul beide wachtwoordvelden in.';
+    m.textContent = tr4(lang,'Vul beide wachtwoordvelden in.','Fill in both password fields.','Veuillez remplir les deux champs de mot de passe.','Rellena ambos campos de contraseña.');
     m.style.display = 'block';
     return;
   }
   if (next.length < 6) {
     const m = document.getElementById('acPassMsg');
-    m.textContent = lang === 'en' ? 'New password must be at least 6 characters.' : 'Nieuw wachtwoord moet minimaal 6 tekens zijn.';
+    m.textContent = tr4(lang,'Nieuw wachtwoord moet minimaal 6 tekens zijn.','New password must be at least 6 characters.','Le nouveau mot de passe doit contenir au moins 6 caractères.','La nueva contraseña debe tener al menos 6 caracteres.');
     m.style.display = 'block';
     return;
   }
@@ -1578,7 +1596,7 @@ function accountChangePassword() {
       document.getElementById('acCurrentPass').value = '';
       document.getElementById('acNewPass').value = '';
       const ok = document.getElementById('acPassOk');
-      ok.textContent = lang === 'en' ? 'Password changed!' : 'Wachtwoord gewijzigd!';
+      ok.textContent = tr4(lang,'Wachtwoord gewijzigd!','Password changed!','Mot de passe modifié !','¡Contraseña cambiada!');
       ok.style.display = 'block';
     })
     .catch(err => {
@@ -2359,47 +2377,69 @@ fbAuth.onAuthStateChanged(user => {
       <div class="contact-form-card" style="margin-bottom:1.5rem">
         <h2 class="lang-nl">Mijn gegevens</h2>
         <h2 class="lang-en">My details</h2>
+        <h2 class="lang-fr">Mes informations</h2>
+        <h2 class="lang-es">Mis datos</h2>
         <div id="acProfileMsg" class="auth-error" style="display:none"></div>
         <div id="acProfileOk" class="quiz-feedback ok" style="display:none;margin-bottom:1rem"></div>
         <div style="display:flex;gap:.75rem">
           <div style="flex:1">
             <label class="fb-label lang-nl">Voornaam</label>
             <label class="fb-label lang-en">First name</label>
+            <label class="fb-label lang-fr">Prénom</label>
+            <label class="fb-label lang-es">Nombre</label>
             <input class="fb-input" id="acFirstName" type="text">
           </div>
           <div style="flex:1">
             <label class="fb-label lang-nl">Achternaam</label>
             <label class="fb-label lang-en">Last name</label>
+            <label class="fb-label lang-fr">Nom</label>
+            <label class="fb-label lang-es">Apellido</label>
             <input class="fb-input" id="acLastName" type="text">
           </div>
         </div>
         <label class="fb-label lang-nl">E-mail</label>
         <label class="fb-label lang-en">Email</label>
+        <label class="fb-label lang-fr">E-mail</label>
+        <label class="fb-label lang-es">Correo electrónico</label>
         <input class="fb-input" id="acEmail" type="email" disabled style="opacity:.6">
         <label class="fb-label lang-nl">Geboortedatum</label>
         <label class="fb-label lang-en">Date of birth</label>
+        <label class="fb-label lang-fr">Date de naissance</label>
+        <label class="fb-label lang-es">Fecha de nacimiento</label>
         <input class="fb-input" id="acBirthdate" type="date">
         <button class="fb-submit lang-nl" style="margin-top:.5rem" onclick="accountSaveProfile()">Opslaan</button>
         <button class="fb-submit lang-en" style="margin-top:.5rem" onclick="accountSaveProfile()">Save</button>
+        <button class="fb-submit lang-fr" style="margin-top:.5rem" onclick="accountSaveProfile()">Enregistrer</button>
+        <button class="fb-submit lang-es" style="margin-top:.5rem" onclick="accountSaveProfile()">Guardar</button>
       </div>
 
       <div class="contact-form-card" style="margin-bottom:1.5rem">
         <h2 class="lang-nl">Wachtwoord wijzigen</h2>
         <h2 class="lang-en">Change password</h2>
+        <h2 class="lang-fr">Changer le mot de passe</h2>
+        <h2 class="lang-es">Cambiar contraseña</h2>
         <div id="acPassMsg" class="auth-error" style="display:none"></div>
         <div id="acPassOk" class="quiz-feedback ok" style="display:none;margin-bottom:1rem"></div>
         <label class="fb-label lang-nl">Huidig wachtwoord</label>
         <label class="fb-label lang-en">Current password</label>
+        <label class="fb-label lang-fr">Mot de passe actuel</label>
+        <label class="fb-label lang-es">Contraseña actual</label>
         <div class="pw-wrap"><input class="fb-input" id="acCurrentPass" type="password" autocomplete="current-password"><button type="button" class="pw-toggle" onclick="toggleAuthPassword('acCurrentPass', this)" aria-label="Show/hide password"><svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M6.61 6.61A18.36 18.36 0 0 0 1 12s4 8 11 8a9.26 9.26 0 0 0 5.39-1.61"/><path d="M1 1l22 22"/></svg></button></div>
         <label class="fb-label lang-nl">Nieuw wachtwoord</label>
         <label class="fb-label lang-en">New password</label>
+        <label class="fb-label lang-fr">Nouveau mot de passe</label>
+        <label class="fb-label lang-es">Nueva contraseña</label>
         <div class="pw-wrap"><input class="fb-input" id="acNewPass" type="password" autocomplete="new-password" placeholder="Minimaal 6 tekens"><button type="button" class="pw-toggle" onclick="toggleAuthPassword('acNewPass', this)" aria-label="Show/hide password"><svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M6.61 6.61A18.36 18.36 0 0 0 1 12s4 8 11 8a9.26 9.26 0 0 0 5.39-1.61"/><path d="M1 1l22 22"/></svg></button></div>
         <button class="fb-submit lang-nl" style="margin-top:.5rem" onclick="accountChangePassword()">Wachtwoord wijzigen</button>
         <button class="fb-submit lang-en" style="margin-top:.5rem" onclick="accountChangePassword()">Change password</button>
+        <button class="fb-submit lang-fr" style="margin-top:.5rem" onclick="accountChangePassword()">Changer le mot de passe</button>
+        <button class="fb-submit lang-es" style="margin-top:.5rem" onclick="accountChangePassword()">Cambiar contraseña</button>
       </div>
 
       <button class="btn btn-outline lang-nl" onclick="authLogout()">Uitloggen</button>
       <button class="btn btn-outline lang-en" onclick="authLogout()">Log out</button>
+      <button class="btn btn-outline lang-fr" onclick="authLogout()">Se déconnecter</button>
+      <button class="btn btn-outline lang-es" onclick="authLogout()">Cerrar sesión</button>
     </div>
   </div>
 </div>
@@ -2432,6 +2472,8 @@ fbAuth.onAuthStateChanged(user => {
           <div>
             <div class="contact-card-title lang-nl">E-mail</div>
             <div class="contact-card-title lang-en">Email</div>
+            <div class="contact-card-title lang-fr">E-mail</div>
+            <div class="contact-card-title lang-es">Correo electrónico</div>
             <div class="contact-card-value">tifinaghhub@gmail.com</div>
           </div>
         </a>
@@ -2449,6 +2491,8 @@ fbAuth.onAuthStateChanged(user => {
       <div class="faq-section">
         <h2 class="lang-nl">Veelgestelde vragen</h2>
         <h2 class="lang-en">Frequently asked questions</h2>
+        <h2 class="lang-fr">Questions fréquentes</h2>
+        <h2 class="lang-es">Preguntas frecuentes</h2>
 
         <div class="lang-nl">
           <details class="faq-item"><summary>Is Tifinaghhub gratis te gebruiken?</summary><p>Ja, alle onderdelen — het alfabet, de woordenlijst, oefeningen en de AI Coach — zijn volledig gratis te gebruiken.</p></details>
@@ -2466,6 +2510,24 @@ fbAuth.onAuthStateChanged(user => {
           <details class="faq-item"><summary>Is my progress saved?</summary><p>Your Practice scores and AI Coach conversations are stored locally in your browser. If you switch device or browser, you'll start fresh.</p></details>
           <details class="faq-item"><summary>Can I report mistakes in the word list or alphabet?</summary><p>Absolutely, please do. Email <strong>tifinaghhub@gmail.com</strong> with what's wrong and we'll fix it.</p></details>
           <details class="faq-item"><summary>Is there an app?</summary><p>Right now Tifinaghhub is only available as a website. You can add it to your home screen for quick access.</p></details>
+        </div>
+
+        <div class="lang-fr">
+          <details class="faq-item"><summary>Tifinaghhub est-il gratuit ?</summary><p>Oui, toutes les parties du site — l'alphabet, la liste de mots, les exercices et l'AI Coach — sont entièrement gratuites.</p></details>
+          <details class="faq-item"><summary>Comment proposer un mot manquant ?</summary><p>Utilisez le bouton « Proposer un mot » en bas du site, ou écrivez-nous directement. Nous ajoutons régulièrement de nouveaux mots.</p></details>
+          <details class="faq-item"><summary>Quelle variante du tamazight est enseignée ici ?</summary><p>Le <strong>tarifit</strong> (aussi appelé rifain), la variante parlée dans les montagnes du Rif autour d'Al Hoceima. D'autres variantes marocaines comme le tachelhit ne sont pas couvertes ici.</p></details>
+          <details class="faq-item"><summary>Ma progression est-elle enregistrée ?</summary><p>Vos scores de pratique et vos conversations avec l'AI Coach sont stockés localement dans votre navigateur. Si vous changez d'appareil ou de navigateur, vous repartirez de zéro.</p></details>
+          <details class="faq-item"><summary>Puis-je signaler des erreurs dans la liste de mots ou l'alphabet ?</summary><p>Absolument, n'hésitez pas. Écrivez à <strong>tifinaghhub@gmail.com</strong> en précisant l'erreur, et nous la corrigerons.</p></details>
+          <details class="faq-item"><summary>Y a-t-il une application ?</summary><p>Pour l'instant, Tifinaghhub n'est disponible que comme site web. Vous pouvez l'ajouter à votre écran d'accueil pour un accès rapide.</p></details>
+        </div>
+
+        <div class="lang-es">
+          <details class="faq-item"><summary>¿Tifinaghhub es gratis?</summary><p>Sí, todas las partes del sitio — el alfabeto, la lista de palabras, los ejercicios y el AI Coach — son totalmente gratuitas.</p></details>
+          <details class="faq-item"><summary>¿Cómo sugiero una palabra que falta?</summary><p>Usa el botón "Sugerir una palabra" al final del sitio, o escríbenos directamente. Añadimos palabras nuevas con regularidad.</p></details>
+          <details class="faq-item"><summary>¿Qué variante del tamazight se enseña aquí?</summary><p>El <strong>tarifit</strong> (también llamado rifeño), la variante hablada en las montañas del Rif alrededor de Al Hoceima. Otras variantes marroquíes como el tachelhit no se cubren aquí.</p></details>
+          <details class="faq-item"><summary>¿Se guarda mi progreso?</summary><p>Tus puntuaciones de práctica y conversaciones con el AI Coach se guardan localmente en tu navegador. Si cambias de dispositivo o navegador, empezarás de nuevo.</p></details>
+          <details class="faq-item"><summary>¿Puedo reportar errores en la lista de palabras o el alfabeto?</summary><p>Por supuesto, hazlo. Escribe a <strong>tifinaghhub@gmail.com</strong> indicando el error y lo corregiremos.</p></details>
+          <details class="faq-item"><summary>¿Hay una aplicación?</summary><p>Por ahora Tifinaghhub solo está disponible como sitio web. Puedes añadirlo a tu pantalla de inicio para un acceso rápido.</p></details>
         </div>
       </div>
 
@@ -3679,7 +3741,7 @@ function submitFeedback() {
 
   const btn = document.querySelector('#fbForm .fb-submit:not([style*="display: none"])') || document.querySelector('#fbForm .fb-submit');
   const btns = document.querySelectorAll('#fbForm .fb-submit');
-  btns.forEach(b => { b.disabled = true; b.dataset.orig = b.textContent; b.textContent = lang === 'en' ? 'Sending…' : 'Versturen…'; });
+  btns.forEach(b => { b.disabled = true; b.dataset.orig = b.textContent; b.textContent = tr4(lang,'Versturen…','Sending…','Envoi…','Enviando…'); });
 
   fetch('https://api.web3forms.com/submit', {
     method: 'POST',
@@ -3705,9 +3767,11 @@ function submitFeedback() {
     }
   })
   .catch(err => {
-    alert(lang === 'en'
-      ? 'Something went wrong sending your message. Please try again later, or email tifinaghhub@gmail.com directly.'
-      : 'Er ging iets mis bij het versturen. Probeer het later nog eens, of mail rechtstreeks naar tifinaghhub@gmail.com.');
+    alert(tr4(lang,
+      'Er ging iets mis bij het versturen. Probeer het later nog eens, of mail rechtstreeks naar tifinaghhub@gmail.com.',
+      'Something went wrong sending your message. Please try again later, or email tifinaghhub@gmail.com directly.',
+      'Une erreur est survenue lors de l\'envoi. Réessayez plus tard, ou écrivez directement à tifinaghhub@gmail.com.',
+      'Algo salió mal al enviar tu mensaje. Inténtalo más tarde, o escribe directamente a tifinaghhub@gmail.com.'));
   })
   .finally(() => {
     btns.forEach(b => { b.disabled = false; b.textContent = b.dataset.orig; });
@@ -3841,33 +3905,51 @@ setTimeout(() => {
     <div id="fbForm">
       <h3 class="lang-nl">Mis je een woord?</h3>
       <h3 class="lang-en">Missing a word?</h3>
+      <h3 class="lang-fr">Un mot manquant ?</h3>
+      <h3 class="lang-es">¿Falta una palabra?</h3>
       <p class="lang-nl">Laat het ons weten — we voegen het toe aan de woordenlijst.</p>
       <p class="lang-en">Let us know — we'll add it to the word list.</p>
+      <p class="lang-fr">Faites-le nous savoir — nous l'ajouterons à la liste de mots.</p>
+      <p class="lang-es">Cuéntanoslo — la añadiremos a la lista de palabras.</p>
       <label class="fb-label lang-nl">Jouw e-mail</label>
       <label class="fb-label lang-en">Your email</label>
+      <label class="fb-label lang-fr">Votre e-mail</label>
+      <label class="fb-label lang-es">Tu correo electrónico</label>
       <input class="fb-input" id="fbEmail" type="email" placeholder="naam@voorbeeld.com">
       <label class="fb-label lang-nl">Woord (Nederlands)</label>
       <label class="fb-label lang-en">Word (English)</label>
+      <label class="fb-label lang-fr">Mot (français)</label>
+      <label class="fb-label lang-es">Palabra (español)</label>
       <input class="fb-input" id="fbNl" type="text" placeholder="bijv. vlinder">
       <label class="fb-label">Tifinagh / Tamazight</label>
       <input class="fb-input" id="fbTif" type="text" placeholder="bijv. ⴰⴼⵔⵜⵓⵜⵜⵓ — afertuttu">
       <label class="fb-label lang-nl">Opmerking (optioneel)</label>
       <label class="fb-label lang-en">Note (optional)</label>
+      <label class="fb-label lang-fr">Remarque (facultatif)</label>
+      <label class="fb-label lang-es">Comentario (opcional)</label>
       <textarea class="fb-input" id="fbNote" rows="2" placeholder=""></textarea>
       <div class="fb-row">
         <button class="fb-cancel lang-nl" onclick="closeFeedback()">Annuleren</button>
         <button class="fb-cancel lang-en" onclick="closeFeedback()">Cancel</button>
+        <button class="fb-cancel lang-fr" onclick="closeFeedback()">Annuler</button>
+        <button class="fb-cancel lang-es" onclick="closeFeedback()">Cancelar</button>
         <button class="fb-submit lang-nl" onclick="submitFeedback()">Versturen</button>
         <button class="fb-submit lang-en" onclick="submitFeedback()">Send</button>
+        <button class="fb-submit lang-fr" onclick="submitFeedback()">Envoyer</button>
+        <button class="fb-submit lang-es" onclick="submitFeedback()">Enviar</button>
       </div>
     </div>
     <div id="fbSuccess" class="fb-success" style="display:none">
       <div class="fb-icon">✓</div>
       <p class="lang-nl" style="color:var(--fg);margin-bottom:1rem">Bedankt! Je voorstel is verstuurd.</p>
       <p class="lang-en" style="color:var(--fg);margin-bottom:1rem">Thanks! Your suggestion has been sent.</p>
+      <p class="lang-fr" style="color:var(--fg);margin-bottom:1rem">Merci ! Votre suggestion a été envoyée.</p>
+      <p class="lang-es" style="color:var(--fg);margin-bottom:1rem">¡Gracias! Tu sugerencia ha sido enviada.</p>
       <div class="fb-row" style="justify-content:center">
         <button class="fb-submit lang-nl" onclick="closeFeedback()">Sluiten</button>
         <button class="fb-submit lang-en" onclick="closeFeedback()">Close</button>
+        <button class="fb-submit lang-fr" onclick="closeFeedback()">Fermer</button>
+        <button class="fb-submit lang-es" onclick="closeFeedback()">Cerrar</button>
       </div>
     </div>
   </div>
