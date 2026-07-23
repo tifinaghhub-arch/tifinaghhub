@@ -1401,11 +1401,12 @@ function sendThankYouEmail(toEmail, toName, lang, kind) {
 
   if (typeof emailjs === 'undefined') return;
   emailjs.send('service_5odrq51', 'template_cneqgh8', {
-    to_email: toEmail,
+    email: toEmail,
     to_name: toName || '',
     subject: subject,
     message: message
-  }).catch(err => console.error('EmailJS fout:', err));
+  }).then(() => console.log('Bedankmail verstuurd naar', toEmail))
+    .catch(err => console.error('EmailJS fout:', err));
 }
 
 function authFriendlyError(code, lang) {
