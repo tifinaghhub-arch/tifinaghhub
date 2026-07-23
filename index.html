@@ -3955,5 +3955,18 @@ setTimeout(() => {
   </div>
 </div>
 
+<!-- ===== BEZOEKERSTELLER (Zendstation dashboard) ===== -->
+<script>
+(function(){
+  try{
+    var today = new Date().toISOString().slice(0,10);
+    var update = {};
+    update.total = firebase.firestore.FieldValue.increment(1);
+    update['days.' + today] = firebase.firestore.FieldValue.increment(1);
+    fbDb.collection('stats').doc('site').set(update, { merge: true });
+  }catch(e){ /* telling mag de site nooit breken */ }
+})();
+</script>
+
 </body>
 </html>
