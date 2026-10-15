@@ -1774,7 +1774,365 @@ footer::before{
   background-size:cover;background-position:center;background-attachment:fixed;
 }
 :root[data-theme="light"] .bg-dunes{
-  background-image:linear-gradient(rgba(var(--bg-rgb),.86),rgba(var(--bg-rgb),.95)),var(--img-dunes);
+  background-image:linear-gradient(rgba(var(--bg-rgb),.78),rgba(var(--bg-rgb),.9)),var(--img-dunes);
+}
+
+
+/* =========================================================
+   ✦ AI COACH — PROFESSIONELE INTERFACE (v2)
+   ========================================================= */
+
+/* ---------- raamwerk ---------- */
+#page-ai{background-attachment:fixed !important}
+#page-ai::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 18% 0%,rgba(var(--cta-rgb),.1),transparent 62%),
+    linear-gradient(180deg,rgba(var(--bg-rgb),.55),rgba(var(--bg-rgb),.86));
+}
+#aiContent{position:relative;z-index:1}
+
+/* ---------- ZIJBALK ---------- */
+.ai-sidebar{
+  width:272px;
+  background:rgba(var(--bg-rgb),.6);
+  backdrop-filter:blur(26px) saturate(150%);
+  -webkit-backdrop-filter:blur(26px) saturate(150%);
+  border-right:1px solid rgba(var(--on-rgb),.07);
+  box-shadow:none;
+}
+:root[data-theme="light"] .ai-sidebar{background:rgba(var(--bg-rgb),.78)}
+
+.ai-sb-logo{
+  padding:18px 16px 15px;
+  border-bottom:1px solid rgba(var(--on-rgb),.06);
+  margin-bottom:6px;
+}
+.ai-sb-logo-icon{
+  width:36px;height:36px;border-radius:11px;font-size:1.2rem;
+  background:linear-gradient(145deg,rgba(var(--cta-rgb),.3),rgba(var(--cta-rgb),.08));
+  box-shadow:0 0 0 1px rgba(var(--cta-rgb),.28),0 6px 18px -8px rgba(var(--cta-rgb),.6);
+  color:var(--cta);
+}
+.ai-sb-logo-text{font-size:1.08rem;color:var(--fg)}
+.ai-sb-logo-text small{letter-spacing:.14em;font-size:.62rem;margin-top:1px}
+
+.ai-sb-top{padding:10px 12px 8px;gap:6px}
+.ai-sb-newchat{
+  padding:11px 14px;border-radius:11px;
+  background:linear-gradient(135deg,rgba(var(--cta-rgb),.2),rgba(var(--cta-rgb),.08));
+  border:1px solid rgba(var(--cta-rgb),.3);
+  color:var(--cta);font-weight:700;letter-spacing:.005em;
+  transition:transform .2s cubic-bezier(.34,1.3,.64,1),box-shadow .25s,background .25s,border-color .25s;
+}
+.ai-sb-newchat:hover{
+  background:linear-gradient(135deg,rgba(var(--cta-rgb),.3),rgba(var(--cta-rgb),.14));
+  border-color:rgba(var(--cta-rgb),.5);
+  transform:translateY(-1px);
+  box-shadow:0 10px 24px -10px rgba(var(--cta-rgb),.65);
+}
+.ai-sb-search,.ai-sb-projects{
+  padding:9px 12px;border-radius:9px;font-weight:500;
+  transition:background .18s,color .18s;
+}
+.ai-sb-search:hover,.ai-sb-projects:hover{background:rgba(var(--on-rgb),.06)}
+.ai-sb-search-input{border-radius:9px;padding:8px 12px}
+.ai-sb-search-input:focus{border-color:rgba(var(--cta-rgb),.5);box-shadow:0 0 0 3px rgba(var(--cta-rgb),.1)}
+.ai-sb-divider{margin:8px 14px 4px;background:rgba(var(--on-rgb),.07)}
+.ai-sb-section-label{
+  font-size:.66rem;letter-spacing:.16em;padding:12px 14px 6px;
+  color:var(--muted);opacity:.8;
+}
+
+/* gesprekken in de lijst */
+.ai-chat-item{
+  padding:9px 11px;border-radius:9px;font-size:.86rem;
+  position:relative;transition:background .16s,color .16s;
+}
+.ai-chat-item::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:2px;height:0;border-radius:2px;background:var(--grad-gold);
+  transition:height .22s cubic-bezier(.34,1.3,.64,1);
+}
+.ai-chat-item:hover{background:rgba(var(--on-rgb),.055)}
+.ai-chat-item.active{
+  background:linear-gradient(90deg,rgba(var(--cta-rgb),.16),rgba(var(--cta-rgb),.04));
+  color:var(--fg);font-weight:600;
+}
+.ai-chat-item.active::before{height:60%}
+.ai-chat-item-del{border-radius:5px}
+.ai-chat-item-del:hover{background:rgba(224,96,96,.14)}
+.ai-project-head{padding:9px 11px;border-radius:9px}
+.ai-project-head:hover{background:rgba(var(--on-rgb),.055)}
+
+/* ---------- KOPBALK ---------- */
+.ai-chat-header{
+  padding:14px 1.75rem;
+  border-bottom:1px solid rgba(var(--on-rgb),.06);
+  background:rgba(var(--bg-rgb),.45);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.ai-chat-title-display{font-size:1.15rem;color:var(--fg);font-weight:600}
+.ai-status{
+  display:inline-flex;align-items:center;gap:.4rem;flex-shrink:0;
+  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);
+  background:rgba(var(--on-rgb),.05);
+  border:1px solid rgba(var(--on-rgb),.08);
+  padding:.3rem .7rem;border-radius:999px;
+}
+.ai-status::before{
+  content:'';width:6px;height:6px;border-radius:50%;background:var(--good);
+  box-shadow:0 0 8px 1px rgba(111,207,151,.8);
+  animation:pulseDot 2.4s ease-in-out infinite;
+}
+@media(max-width:620px){.ai-status span{display:none}.ai-status{padding:.3rem .45rem}}
+
+/* ---------- BERICHTEN ---------- */
+.ai-messages{
+  padding:2rem 1.75rem 1rem;gap:1.5rem;
+  scroll-behavior:smooth;
+}
+.ai-msg{max-width:780px;margin-left:auto;margin-right:auto;gap:.9rem}
+.ai-msg.user{margin-left:auto;margin-right:auto;flex-direction:row-reverse}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ai-msg{animation:msgIn .34s cubic-bezier(.2,.7,.3,1)}
+
+.ai-avatar{width:34px;height:34px;font-size:.8rem;margin-top:1px}
+.ai-avatar.bot{
+  background:linear-gradient(145deg,rgba(var(--cta-rgb),.32),rgba(var(--cta-rgb),.1));
+  box-shadow:0 0 0 1px rgba(var(--cta-rgb),.3),0 6px 16px -8px rgba(var(--cta-rgb),.7);
+  font-size:1rem;
+}
+.ai-avatar.user{
+  background:rgba(var(--on-rgb),.09);
+  box-shadow:0 0 0 1px rgba(var(--on-rgb),.08);
+  color:var(--fg);font-weight:700;
+}
+
+.ai-bubble{padding:.85rem 1.15rem;font-size:.93rem;line-height:1.7;max-width:88%}
+.ai-msg.bot .ai-bubble{
+  background:rgba(var(--on-rgb),.045);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(var(--on-rgb),.08);
+  border-radius:6px 18px 18px 18px;
+  box-shadow:0 10px 30px -18px rgba(0,0,0,.8);
+}
+:root[data-theme="light"] .ai-msg.bot .ai-bubble{background:rgba(255,255,255,.82)}
+.ai-msg.user .ai-bubble{
+  background:linear-gradient(135deg,rgba(var(--cta-rgb),.26),rgba(var(--cta-rgb),.13));
+  border:1px solid rgba(var(--cta-rgb),.3);
+  border-radius:18px 6px 18px 18px;
+  box-shadow:0 10px 26px -16px rgba(var(--cta-rgb),.8);
+}
+.ai-bubble strong{color:var(--highlight)}
+.ai-bubble em{color:var(--accent)}
+
+/* woord-/letterkaartjes in een antwoord */
+.ai-bubble .word-row{
+  gap:.9rem;border-radius:11px;padding:.65rem .9rem;margin:.55rem 0;
+  background:rgba(var(--on-rgb),.05);
+  border:1px solid rgba(var(--on-rgb),.07);
+  transition:border-color .2s,background .2s,transform .2s;
+}
+.ai-bubble .word-row:hover{
+  border-color:rgba(var(--cta-rgb),.35);
+  background:rgba(var(--cta-rgb),.07);
+  transform:translateX(3px);
+}
+.ai-bubble .tifi{font-size:1.6rem}
+.ai-bubble .tam{color:var(--fg)}
+
+/* typindicator */
+.ai-typing span{background:var(--cta);opacity:.8}
+
+/* ---------- WELKOMSTSCHERM ---------- */
+.ai-welcome{gap:1.5rem;padding:2rem 1.5rem}
+.ai-welcome::before{font-size:22rem;color:rgba(var(--cta-rgb),.04)}
+.ai-welcome h2{
+  font-size:clamp(1.9rem,4.5vw,2.8rem);letter-spacing:-.03em;margin-bottom:.1rem;
+}
+.ai-welcome h2 .gold-text,.ai-welcome h2 em{
+  font-style:normal;
+  background:var(--grad-gold);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.ai-welcome-sub{
+  color:var(--muted);font-size:.98rem;max-width:460px;margin:-.5rem auto 0;
+  position:relative;line-height:1.6;
+}
+
+/* invoerveld op het welkomstscherm */
+.ai-welcome-input-row{max-width:620px}
+.ai-welcome-input{
+  border-radius:999px !important;
+  padding:1rem 1.5rem !important;
+  background:rgba(var(--on-rgb),.05) !important;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(var(--on-rgb),.12) !important;
+  box-shadow:0 16px 40px -20px rgba(0,0,0,.9) !important;
+}
+:root[data-theme="light"] .ai-welcome-input{background:rgba(255,255,255,.85) !important}
+.ai-welcome-input:focus{
+  border-color:rgba(var(--cta-rgb),.5) !important;
+  box-shadow:0 0 0 4px rgba(var(--cta-rgb),.12),0 16px 40px -20px rgba(0,0,0,.9) !important;
+}
+
+/* suggestiekaarten in plaats van losse chips */
+.ai-sugs-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:.7rem;width:100%;max-width:620px;position:relative;margin-top:.4rem;
+}
+.ai-sug-card{
+  display:flex;align-items:flex-start;gap:.7rem;text-align:left;
+  padding:.9rem 1rem;border-radius:13px;cursor:pointer;
+  background:rgba(var(--on-rgb),.04);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(var(--on-rgb),.08);
+  color:var(--fg);font-family:'Karla',sans-serif;font-size:.86rem;line-height:1.45;
+  transition:transform .24s cubic-bezier(.34,1.3,.64,1),border-color .22s,background .22s,box-shadow .22s;
+}
+:root[data-theme="light"] .ai-sug-card{background:rgba(255,255,255,.8)}
+.ai-sug-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(var(--cta-rgb),.4);
+  background:rgba(var(--cta-rgb),.08);
+  box-shadow:0 14px 30px -16px rgba(var(--cta-rgb),.7);
+}
+.ai-sug-card .ico{
+  width:30px;height:30px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(var(--cta-rgb),.16);color:var(--cta);font-size:.95rem;
+  font-family:'Noto Sans Tifinagh',sans-serif;
+}
+.ai-sug-card b{display:block;font-weight:700;margin-bottom:.1rem;color:var(--fg)}
+.ai-sug-card span{color:var(--muted);font-size:.78rem}
+@media(max-width:640px){.ai-sugs-grid{grid-template-columns:1fr}}
+
+/* losse chips (vervolgvragen) */
+.ai-sug{
+  border-radius:999px;padding:.45rem 1rem;
+  background:rgba(var(--on-rgb),.05);
+  border:1px solid rgba(var(--on-rgb),.1);
+  box-shadow:none;transition:all .2s;
+}
+.ai-sug:hover{
+  border-color:rgba(var(--cta-rgb),.45);color:var(--cta);
+  background:rgba(var(--cta-rgb),.1);transform:translateY(-1px);
+}
+
+/* ---------- INVOERBALK ONDERAAN ---------- */
+.ai-bottom{
+  padding:1rem 1.75rem 1.4rem;
+  border-top:1px solid rgba(var(--on-rgb),.06);
+  background:linear-gradient(180deg,rgba(var(--bg-rgb),.4),rgba(var(--bg-rgb),.82));
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.ai-input-row{
+  max-width:780px;margin:0 auto;gap:.6rem;align-items:flex-end;
+  background:rgba(var(--on-rgb),.05);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(var(--on-rgb),.1);
+  border-radius:22px;padding:.4rem .4rem .4rem .35rem;
+  transition:border-color .22s,box-shadow .22s;
+  box-shadow:0 14px 36px -22px rgba(0,0,0,.9);
+}
+:root[data-theme="light"] .ai-input-row{background:rgba(255,255,255,.86)}
+.ai-input-row:focus-within{
+  border-color:rgba(var(--cta-rgb),.45);
+  box-shadow:0 0 0 4px rgba(var(--cta-rgb),.1),0 14px 36px -22px rgba(0,0,0,.9);
+}
+.ai-input-row .ai-input{
+  background:transparent !important;border:none !important;
+  box-shadow:none !important;padding:.65rem .9rem !important;
+  min-height:42px;
+}
+.ai-input-row .ai-input:focus{border:none !important;box-shadow:none !important}
+.ai-send{
+  width:40px;height:40px;
+  background:var(--grad-gold);
+  box-shadow:0 6px 18px -6px rgba(var(--cta-rgb),.8);
+  transition:transform .2s cubic-bezier(.34,1.4,.64,1),box-shadow .22s,opacity .2s;
+}
+.ai-send:hover{transform:scale(1.08) rotate(3deg);box-shadow:0 10px 24px -6px rgba(var(--cta-rgb),.95)}
+.ai-send:active{transform:scale(.96)}
+.ai-hint{
+  max-width:780px;margin:.55rem auto 0;text-align:center;
+  font-size:.7rem;color:var(--muted);opacity:.65;
+}
+
+/* ---------- VERGRENDELD SCHERM ---------- */
+.locked-box{
+  max-width:420px;padding:2.5rem 2rem;
+  background:rgba(var(--on-rgb),.045);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(var(--on-rgb),.1);
+  border-radius:20px;box-shadow:var(--shadow-md);
+}
+:root[data-theme="light"] .locked-box{background:rgba(255,255,255,.86)}
+.locked-icon{
+  font-size:0;width:60px;height:60px;margin:0 auto 1.2rem;border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,rgba(var(--cta-rgb),.26),rgba(var(--cta-rgb),.08));
+  border:1px solid rgba(var(--cta-rgb),.26);
+}
+.locked-icon::after{
+  content:'';width:26px;height:26px;background:var(--cta);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.locked-box h2{font-size:1.75rem;margin-bottom:.7rem}
+
+/* ---------- ZIJBALK-KNOPPEN ---------- */
+.ai-sidebar-toggle{border-radius:9px;background:rgba(var(--on-rgb),.04)}
+.ai-sidebar-toggle:hover{background:rgba(var(--on-rgb),.09)}
+
+@media(max-width:700px){
+  .ai-messages{padding:1.25rem 1rem .5rem;gap:1.15rem}
+  .ai-bottom{padding:.75rem 1rem 1rem}
+  .ai-chat-header{padding:12px 1rem}
+  .ai-bubble{max-width:90%;font-size:.9rem}
+  .ai-welcome::before{font-size:14rem}
+  .ai-welcome h2{font-size:1.8rem}
+  .ai-welcome-sub{font-size:.9rem}
+  .ai-welcome-input{padding:.85rem 1.2rem !important;font-size:.92rem !important}
+  .ai-welcome-input-row{gap:.5rem}
+  .ai-sug-card{padding:.8rem .9rem}
+}
+
+/* =========================================================
+   ✦ ACHTERGROND OOK OP WOORDEN & OEFENEN
+   ========================================================= */
+#page-woorden .search-wrap{
+  background:rgba(var(--bg-rgb),.9);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+#page-woorden .words-table,#page-oefenen .quiz-layout{position:relative}
+#page-woorden .words-table th{
+  background:rgba(var(--bg-rgb),.75);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+/* leesbaarheid boven de foto: de tabel als eigen paneel */
+#page-woorden #words-container{
+  background:rgba(var(--on-rgb),.04);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(var(--on-rgb),.08);
+  border-radius:var(--radius);
+  padding:.25rem 1.25rem 1rem;
+  box-shadow:0 18px 44px -28px rgba(0,0,0,.9);
+}
+:root[data-theme="light"] #page-woorden #words-container{
+  background:rgba(255,255,255,.82);
+  box-shadow:0 18px 44px -30px rgba(70,48,14,.5);
+}
+#page-woorden .words-section{margin-bottom:1.75rem}
+#page-woorden .uitspraak-box{
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(var(--on-rgb),.05);
+}
+:root[data-theme="light"] #page-woorden .uitspraak-box{background:rgba(255,255,255,.82)}
+#page-oefenen .quiz-toolbar,#page-oefenen .quiz-card{
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
 }
 
 </style>
@@ -2728,7 +3086,7 @@ fbAuth.onAuthStateChanged(user => {
 </div>
 
 <!-- ===== PAGE: WOORDEN ===== -->
-<div id="page-woorden" class="page">
+<div id="page-woorden" class="page bg-dunes">
   <div class="container">
     <div class="page-header">
       <div class="tag">Tarifit · Al Hoceima</div>
@@ -2765,7 +3123,7 @@ fbAuth.onAuthStateChanged(user => {
 </div>
 
 <!-- ===== PAGE: OEFENEN ===== -->
-<div id="page-oefenen" class="page">
+<div id="page-oefenen" class="page bg-dunes">
   <div class="container">
     <div class="page-header">
       <div class="tag lang-nl">Interactief</div>
@@ -3249,6 +3607,10 @@ fbAuth.onAuthStateChanged(user => {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </button>
       <span class="ai-chat-title-display" id="aiChatTitleDisplay">AI Coach</span>
+      <div class="ai-status" title="Tifinaghhub AI Coach">
+        <span class="lang-nl">Online</span><span class="lang-en">Online</span>
+        <span class="lang-fr">En ligne</span><span class="lang-es">En línea</span>
+      </div>
     </div>
     <div class="ai-sidebar-backdrop" id="aiSidebarBackdrop" onclick="aiToggleSidebar()"></div>
 
@@ -3263,7 +3625,13 @@ fbAuth.onAuthStateChanged(user => {
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"></textarea>
         <textarea class="ai-input lang-en" id="aiInputEn" placeholder="Ask a question about Tifinagh..." rows="1"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}" oninput="document.getElementById('aiInput').value=this.value"></textarea>
-        <button class="ai-send" id="aiSendBtn" onclick="aiSend()">&#10148;</button>
+        <button class="ai-send" id="aiSendBtn" onclick="aiSend()" aria-label="Verstuur"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+      </div>
+      <div class="ai-hint">
+        <span class="lang-nl">Enter om te versturen · Shift+Enter voor een nieuwe regel</span>
+        <span class="lang-en">Enter to send · Shift+Enter for a new line</span>
+        <span class="lang-fr">Entrée pour envoyer · Maj+Entrée pour une nouvelle ligne</span>
+        <span class="lang-es">Enter para enviar · Shift+Enter para una nueva línea</span>
       </div>
     </div>
   </div>
@@ -4286,32 +4654,72 @@ function aiAddMsg(role, html) {
 
 function aiShowWelcome() {
   const box = document.getElementById('aiMessages');
+  if (!box) return;
   const lang = curLang();
-  // Alleen het "Wat wil je leren vandaag?" blok — geen welkomstballon
+
+  const T = {
+    nl:{ hi:'Wat wil je', hl:'leren vandaag?',
+         sub:'Vraag me naar een letter, een woord, de grammatica of de geschiedenis van het Rif.',
+         ph:'Stel een vraag over Tifinagh...' },
+    en:{ hi:'What do you want to', hl:'learn today?',
+         sub:'Ask me about a letter, a word, the grammar, or the history of the Rif.',
+         ph:'Ask a question about Tifinagh...' },
+    fr:{ hi:'Que voulez-vous', hl:'apprendre aujourd\'hui ?',
+         sub:'Posez-moi une question sur une lettre, un mot, la grammaire ou l\'histoire du Rif.',
+         ph:'Posez une question sur le tifinagh...' },
+    es:{ hi:'¿Qué quieres', hl:'aprender hoy?',
+         sub:'Pregúntame por una letra, una palabra, la gramática o la historia del Rif.',
+         ph:'Haz una pregunta sobre tifinagh...' }
+  }[lang];
+
+  const CARDS = {
+    nl:[['ⵣ','Spreek een letter uit','Hoe klinkt ⵣ precies?','Hoe spreek ik ⵣ uit?'],
+        ['ⵡ','Woorden om te starten','Vijf woorden voor elke dag','Geef me 5 basiswoorden'],
+        ['ⴰ','Betekenis van Amazigh','Waar komt de naam vandaan?','Wat betekent Amazigh?'],
+        ['ⵎ','Geschiedenis van de Rif','Wie was Abd el-Krim?','Wie was Abd el-Krim?']],
+    en:[['ⵣ','Pronounce a letter','What does ⵣ sound like?','How do I pronounce ⵣ?'],
+        ['ⵡ','Words to start with','Five words for every day','Give me 5 basic words'],
+        ['ⴰ','Meaning of Amazigh','Where does the name come from?','What does Amazigh mean?'],
+        ['ⵎ','History of the Rif','Who was Abd el-Krim?','Who was Abd el-Krim?']],
+    fr:[['ⵣ','Prononcer une lettre','Comment sonne ⵣ ?','Hoe spreek ik ⵣ uit?'],
+        ['ⵡ','Mots pour débuter','Cinq mots du quotidien','Geef me 5 basiswoorden'],
+        ['ⴰ','Sens d\'Amazigh','D\'où vient ce nom ?','Wat betekent Amazigh?'],
+        ['ⵎ','Histoire du Rif','Qui était Abd el-Krim ?','Wie was Abd el-Krim?']],
+    es:[['ⵣ','Pronunciar una letra','¿Cómo suena ⵣ?','Hoe spreek ik ⵣ uit?'],
+        ['ⵡ','Palabras para empezar','Cinco palabras del día a día','Geef me 5 basiswoorden'],
+        ['ⴰ','Significado de Amazigh','¿De dónde viene el nombre?','Wat betekent Amazigh?'],
+        ['ⵎ','Historia del Rif','¿Quién fue Abd el-Krim?','Wie was Abd el-Krim?']]
+  }[lang];
+
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const q   = s => String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
   const wrap = document.createElement('div');
   wrap.id = 'aiWelcomeBlock';
-  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:1rem;padding:3rem 2rem 0.5rem;text-align:center;';
-  const heading = lang === 'en' ? 'What do you want to learn today?' : 'Wat wil je leren vandaag?';
-  const placeholder = lang === 'en' ? 'Ask a question...' : 'Stel een vraag...';
-  const suggestions = lang === 'en'
-    ? [['How do I pronounce ⵣ?','How do I pronounce ⵣ?'],['What does Amazigh mean?','What does Amazigh mean?'],['Give me 5 basic words','Give me 5 basic words'],['Who was Abd el-Krim?','Who was Abd el-Krim?'],['Tamazight vs Tarifit?','Tamazight vs Tarifit?']]
-    : [['Hoe spreek ik ⵣ uit?','Hoe spreek ik ⵣ uit?'],['Wat betekent Amazigh?','Wat betekent Amazigh?'],['Geef me 5 basiswoorden','Geef me 5 basiswoorden'],['Wie was Abd el-Krim?','Wie was Abd el-Krim?'],['Tmazight vs Tarifit?','Tmazight vs Tarifit?']];
+  wrap.className = 'ai-welcome';
+
   wrap.innerHTML =
-    '<h2 style="font-family:\'Cormorant Garamond\',serif;font-size:2rem;color:var(--fg);font-weight:600;margin:0">' + heading + '</h2>' +
-    '<div style="display:flex;gap:.75rem;align-items:flex-end;width:100%;max-width:560px">' +
-      '<textarea id="aiInputWelcome" placeholder="' + placeholder + '" rows="1" ' +
-        'style="flex:1;padding:.85rem 1.4rem;border-radius:30px;background:var(--surface2);border:1px solid rgba(var(--on-rgb),0.12);color:var(--fg);font-family:\'Karla\',sans-serif;font-size:1rem;outline:none;resize:none;line-height:1.5;min-height:44px;max-height:120px;overflow-y:auto;transition:border-color .2s;" ' +
+    '<h2>' + esc(T.hi) + ' <em>' + esc(T.hl) + '</em></h2>' +
+    '<p class="ai-welcome-sub">' + esc(T.sub) + '</p>' +
+    '<div class="ai-welcome-input-row">' +
+      '<textarea id="aiInputWelcome" class="ai-input ai-welcome-input" rows="1" placeholder="' + esc(T.ph) + '" ' +
         'onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();aiSendFromWelcome()}" ' +
-        'oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,120)+\'px\'">' +
-      '</textarea>' +
-      '<button onclick="aiSendFromWelcome()" style="width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--cta);border:none;color:var(--cta-ink);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .2s" onmouseover="this.style.background=\'var(--cta-hover)\'" onmouseout="this.style.background=\'var(--cta)\'">&#10148;</button>' +
+        'oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,120)+\'px\'"></textarea>' +
+      '<button class="ai-send" onclick="aiSendFromWelcome()" aria-label="Verstuur">' +
+        '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' +
+      '</button>' +
     '</div>' +
-    '<div style="display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:680px">' +
-      suggestions.map(s => '<button class="ai-sug" onclick="aiAsk(\'' + s[0].replace(/'/g,"\\'") + '\')">' + s[1] + '</button>').join('') +
+    '<div class="ai-sugs-grid">' +
+      CARDS.map(c =>
+        '<button class="ai-sug-card" onclick="aiAsk(\'' + q(c[3]) + '\')">' +
+          '<span class="ico tifi">' + esc(c[0]) + '</span>' +
+          '<span><b>' + esc(c[1]) + '</b><span>' + esc(c[2]) + '</span></span>' +
+        '</button>').join('') +
     '</div>';
+
   box.appendChild(wrap);
   box.scrollTop = 0;
-  setTimeout(() => { const inp = document.getElementById('aiInputWelcome'); if(inp) inp.focus(); }, 100);
+  setTimeout(() => { const inp = document.getElementById('aiInputWelcome'); if (inp) inp.focus(); }, 120);
 }
 
 function aiRefreshLangUI() {
