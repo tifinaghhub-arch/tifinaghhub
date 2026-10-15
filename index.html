@@ -5483,5 +5483,1105 @@ window.TFH_IMG={"rif1":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDA
 })();
 
 </script>
+<script>
+/* =========================================================================
+   ✦ TIFINAGHHUB — SLIMME OFFLINE TAALMOTOR  (v3)
+   Vervangt aiAnswer(). Werkt zonder API, zonder internet.
+   Alle Tarifit komt uit WORDS / ABC en de Uitleg-pagina van deze site —
+   er wordt niets bijverzonnen.
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var L = function () { return (typeof curLang === 'function') ? curLang() : 'nl'; };
+  var T = function (nl, en, fr, es) {
+    var l = L();
+    return l === 'en' ? en : l === 'fr' ? (fr || en) : l === 'es' ? (es || en) : nl;
+  };
+  var E = function (s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+
+  /* ---------------------------------------------------------------- 1. TEKST */
+
+  function N(s) {
+    return String(s || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[?!.,;:'"`()\[\]/\\_*\u2013\u2014-]/g, ' ')
+      .replace(/\s+/g, ' ').trim();
+  }
+  function TOK(s) { return N(s).split(' ').filter(function (w) { return w.length > 0; }); }
+
+  function lev(a, b) {
+    if (a === b) return 0;
+    var la = a.length, lb = b.length;
+    if (!la) return lb; if (!lb) return la;
+    var prev = [], i, j;
+    for (j = 0; j <= lb; j++) prev[j] = j;
+    for (i = 1; i <= la; i++) {
+      var cur = [i];
+      for (j = 1; j <= lb; j++) {
+        cur[j] = a.charAt(i - 1) === b.charAt(j - 1)
+          ? prev[j - 1]
+          : 1 + Math.min(prev[j - 1], prev[j], cur[j - 1]);
+      }
+      prev = cur;
+    }
+    return prev[lb];
+  }
+  /* 0..1 — hoe sterk lijken twee losse woorden op elkaar */
+  function sim(a, b) {
+    a = N(a); b = N(b);
+    if (!a || !b) return 0;
+    if (a === b) return 1;
+    var m = Math.max(a.length, b.length);
+    return Math.max(0, 1 - lev(a, b) / m);
+  }
+
+  /* ------------------------------------------------- 2. TIFINAGH <-> LATIJN */
+
+  var TIF2LAT = {}, LAT2TIF = {};
+  (function () {
+    if (typeof ABC === 'undefined') return;
+    ABC.forEach(function (x) {
+      TIF2LAT[x.t] = x.l;
+      if (!LAT2TIF[x.l]) LAT2TIF[x.l] = x.t;
+    });
+  })();
+  var TIF_RE = /[ⴰ-⵿]/;
+
+  function translit(s) {                       // Tifinagh -> Latijn
+    var out = '', i = 0;
+    while (i < s.length) {
+      var two = s.substr(i, 2);
+      if (TIF2LAT[two]) { out += TIF2LAT[two]; i += 2; continue; }
+      var one = s.charAt(i);
+      out += (TIF2LAT[one] !== undefined ? TIF2LAT[one] : one);
+      i += 1;
+    }
+    return out;
+  }
+
+  /* ------------------------------------------------------ 3. WOORDENINDEX */
+
+  var W = [];                                  // genormaliseerde zoekindex
+  (function () {
+    if (typeof WORDS === 'undefined') return;
+    WORDS.forEach(function (r, i) {
+      W.push({
+        i: i, nl: r[0], tam: r[1], tif: r[2],
+        en: r[3] || r[0], fr: r[4] || r[3] || r[0], es: r[5] || r[3] || r[0],
+        /* "Aman / Emen" -> ['aman','emen'] ; "1 – één" -> ['1','een'] */
+        keys: [r[0], r[3] || '', r[4] || '', r[5] || '']
+          .join('|').split(/[|/,–-]/).map(N).filter(function (x) { return x; }),
+        tamKeys: String(r[1]).split(/[/,]/).map(N).filter(function (x) { return x; })
+      });
+    });
+  })();
+
+  function gloss(w) {
+    var l = L();
+    return l === 'en' ? w.en : l === 'fr' ? w.fr : l === 'es' ? w.es : w.nl;
+  }
+  function card(w) {
+    return '<div class="word-row"><span class="tifi">' + E(w.tif) + '</span>' +
+           '<span class="tam">' + E(w.tam) + '</span>' +
+           '<span class="nl">(' + E(gloss(w)) + ')</span></div>';
+  }
+  function lcard(x) {
+    var d = L() === 'en' ? (x.p_en || x.p) : x.p;
+    return '<div class="word-row"><span class="tifi">' + E(x.t) + '</span>' +
+           '<span class="tam">' + E(x.l) + '</span>' +
+           '<span class="nl">' + E(d) + '</span></div>';
+  }
+
+  /* -------------------------------------------------------- 4. THEMAGROEPEN */
+
+  var GROUPS = {
+    begroeting: { nl: 'begroetingen', en: 'greetings', fr: 'salutations', es: 'saludos',
+      w: ['Hallo', 'Doei', 'Hoe gaat het', 'Goed', 'Sorry', 'Ik heet', 'Naam'] },
+    familie: { nl: 'familiewoorden', en: 'family words', fr: 'mots de famille', es: 'palabras de familia',
+      w: ['Mama', 'Vader', 'Broer', 'Zus', 'Opa', 'Oma', 'Mijn broer', 'Mijn zus',
+          'Onze voorouders', 'Vriend', 'Vriendin', 'Mensen'] },
+    eten: { nl: 'eten en drinken', en: 'food and drink', fr: 'nourriture et boissons', es: 'comida y bebida',
+      w: ['Water', 'Brood', 'Thee', 'Koffie', 'Melk', 'Suiker', 'Appel', 'Banaan', 'Aardappel',
+          'Komkommer', 'Ei', 'Vlees', 'Vis', 'Zout', 'Olie', 'Honing', 'Rijst', 'Soep',
+          'Boter', 'Ui', 'Tomaat', 'Wortel', 'Sinaasappel', 'Pittig'] },
+    lichaam: { nl: 'lichaamsdelen', en: 'body parts', fr: 'parties du corps', es: 'partes del cuerpo',
+      w: ['Hand', 'Hoofd', 'Oog', 'Oren', 'Mond', 'Neus', 'Tand', 'Voet', 'Met de hand'] },
+    getallen: { nl: 'de getallen', en: 'the numbers', fr: 'les nombres', es: 'los números',
+      w: ['1 – één', '2 – twee', '3 – drie', '4 – vier', '5 – vijf', '6 – zes', '7 – zeven',
+          '8 – acht', '9 – negen', '10 – tien', '20 – twintig', '30 – dertig', '40 – veertig',
+          '50 – vijftig', '60 – zestig', '70 – zeventig'] },
+    dieren: { nl: 'dieren', en: 'animals', fr: 'animaux', es: 'animales',
+      w: ['Ezel', 'Kip', 'Hond', 'Vis'] },
+    huis: { nl: 'huis en plaatsen', en: 'house and places', fr: 'maison et lieux', es: 'casa y lugares',
+      w: ['Huis', 'Deur', 'Kamer', 'Raam', 'Sleutel', 'Kussen', 'Toilet', 'Winkel', 'Dorp',
+          'Weg (straat)', 'School', 'Apotheek', 'Steen'] },
+    natuur: { nl: 'natuur', en: 'nature', fr: 'nature', es: 'naturaleza',
+      w: ['Maan', 'Zon', 'Regen', 'Hemel', 'Water', 'Steen'] },
+    vragen: { nl: 'vraagwoorden', en: 'question words', fr: 'mots interrogatifs', es: 'palabras interrogativas',
+      w: ['Wat', 'Waarom', 'Waar', 'Hoe', 'Hoeveel', 'Waar is', 'Waar ben jij',
+          'Waar kom jij vandaan', 'Wat doe je', 'Wat zeg je', 'Wat kijk je', 'Wat zie je'] },
+    werkwoorden: { nl: 'werkwoorden', en: 'verbs', fr: 'verbes', es: 'verbos',
+      w: ['Kijken', 'Luisteren', 'Schrijven', 'Komen', 'Vinden', 'Vragen', 'Zit', 'Sta op',
+          'Open', 'Dicht', 'Ga naar huis', 'Kom hier'] },
+    dagelijks: { nl: 'dagelijkse dingen', en: 'everyday things', fr: 'objets du quotidien', es: 'cosas cotidianas',
+      w: ['Telefoon', 'Auto', 'Geld', 'Tijd', 'Horloge', 'Bril', 'Pen / Potlood', 'Zak',
+          'Vork', 'Schoen', 'Werk', 'Probleem'] }
+  };
+
+  var GROUP_HINTS = {
+    begroeting: ['begroet', 'groet', 'hallo', 'greeting', 'hello', 'salut', 'saludo', 'kennismak'],
+    familie: ['familie', 'family', 'famille', 'familia', 'ouders', 'broer', 'zus', 'moeder', 'vader'],
+    eten: ['eten', 'drink', 'voedsel', 'food', 'drink', 'eat', 'nourriture', 'manger', 'comida', 'comer', 'keuken', 'fruit', 'groente'],
+    lichaam: ['lichaam', 'lijf', 'body', 'corps', 'cuerpo', 'lichaamsdeel'],
+    getallen: ['getal', 'cijfer', 'tellen', 'nummer', 'number', 'count', 'numero', 'nombre', 'chiffre', 'contar'],
+    dieren: ['dier', 'animal', 'beest', 'animaux', 'animales'],
+    huis: ['huis', 'woning', 'kamer', 'house', 'home', 'maison', 'casa', 'plaats', 'place', 'stad', 'dorp'],
+    natuur: ['natuur', 'weer', 'nature', 'weather', 'naturaleza', 'lucht', 'hemel'],
+    vragen: ['vraagwoord', 'vragen stellen', 'question word', 'vraagzin', 'interrogat'],
+    werkwoorden: ['werkwoord', 'verb', 'verbe', 'verbo', 'actie'],
+    dagelijks: ['dagelijks', 'spullen', 'everyday', 'daily', 'objet', 'cotidian', 'voorwerp']
+  };
+
+  function groupWords(key) {
+    var names = GROUPS[key].w.map(N);
+    return W.filter(function (w) { return names.indexOf(N(w.nl)) >= 0; });
+  }
+  function groupName(key) {
+    var g = GROUPS[key], l = L();
+    return l === 'en' ? g.en : l === 'fr' ? g.fr : l === 'es' ? g.es : g.nl;
+  }
+
+  /* ------------------------------------------------------------ 5. GEHEUGEN */
+
+  var MEM = { words: [], letter: null, topic: null, person: null, quiz: null, seen: {} };
+
+  /* --------------------------------------------------------- 6. KENNISBANK */
+  /* Inhoud komt uit de Uitleg-pagina van deze site. nl + en; fr/es vallen terug op en. */
+
+  var KB = [
+    { id: 'schrift',
+      k: ['wat is tifinagh', 'hoe werkt tifinagh', 'het schrift', 'welk schrift', 'what is tifinagh',
+          'how does tifinagh work', 'the script', 'quest ce que le tifinagh', 'que es tifinagh'],
+      nl: 'Tifinagh is een van de <strong>oudste schriften ter wereld</strong> en wordt al duizenden jaren gebruikt door Amazigh-volkeren in Noord-Afrika. Het moderne Neo-Tifinagh, zoals in Marokko gebruikt, is gestandaardiseerd door het <strong>IRCAM</strong>.<br><br>Anders dan het Arabisch schrijf je Tifinagh <strong>van links naar rechts</strong>, net als het Nederlands. Elk symbool staat voor precies één klank, wat het schrift relatief makkelijk te leren maakt. De Tarifit-variant telt <strong>31 letters</strong>.',
+      en: 'Tifinagh is one of the <strong>oldest scripts in the world</strong>, used for thousands of years by Amazigh peoples across North Africa. Modern Neo-Tifinagh, as used in Morocco, was standardised by <strong>IRCAM</strong>.<br><br>Unlike Arabic, Tifinagh is written <strong>left to right</strong>. Each symbol stands for exactly one sound, which makes the script relatively easy to learn. The Tarifit variant has <strong>31 letters</strong>.',
+      f: [['Hoe werkt het alfabet?', 'How does the alphabet work?'], ['Welke klanken zijn moeilijk?', 'Which sounds are difficult?']] },
+
+    { id: 'klanken',
+      k: ['moeilijke klanken', 'welke klanken', 'keelklank', 'emfatisch', 'uitspraak algemeen',
+          'difficult sounds', 'which sounds', 'throat sound', 'emphatic', 'pronunciation'],
+      nl: 'Tarifit heeft klanken die het Nederlands niet kent. De belangrijkste:<br><br>' +
+          '<strong>Emfatische letters</strong> (ḍ ṭ ṣ ṛ ẓ) — diepere versies van d, t, s, r, z, vanuit de keel.<br>' +
+          '<strong>Ayn</strong> (ⵄ / ɛ) — een gespannen keelklank, als het Arabische ع.<br>' +
+          '<strong>Faryngale h</strong> (ⵃ / ḥ) — een sterke h vanuit de keel, als het Arabische ح.<br>' +
+          '<strong>Ghayn</strong> (ⵖ / ɣ) — een zachte rollende keelklank, als de Parijse "r".<br>' +
+          '<strong>Velaire x</strong> (ⵅ) — als de "ch" in "licht".<br>' +
+          '<strong>Uvulaire q</strong> (ⵇ) — een diepe stop achter in de keel.<br><br>' +
+          'De klinkers zijn <strong>a, e (sjwa), i en u</strong>. De sjwa (ⴻ) is een korte, neutrale klinker die veel voorkomt.',
+      en: 'Tarifit has sounds that English does not. The main ones:<br><br>' +
+          '<strong>Emphatic letters</strong> (ḍ ṭ ṣ ṛ ẓ) — deeper versions of d, t, s, r, z, from the throat.<br>' +
+          '<strong>Ayn</strong> (ⵄ / ɛ) — a tight pharyngeal sound, like Arabic ع.<br>' +
+          '<strong>Pharyngeal h</strong> (ⵃ / ḥ) — a strong h from the throat, like Arabic ح.<br>' +
+          '<strong>Ghayn</strong> (ⵖ / ɣ) — a soft rolling throat sound, like the Parisian "r".<br>' +
+          '<strong>Velar x</strong> (ⵅ) — like "ch" in Scottish "loch".<br>' +
+          '<strong>Uvular q</strong> (ⵇ) — a deep stop far back in the throat.<br><br>' +
+          'The vowels are <strong>a, e (schwa), i and u</strong>. The schwa (ⴻ) is a short, neutral vowel that appears often.',
+      f: [['Hoe spreek ik ⵄ uit?', 'How do I pronounce ⵄ?'], ['Hoe werkt het alfabet?', 'How does the alphabet work?']] },
+
+    { id: 'voorvoegsel',
+      k: ['voorvoegsel', 'prefix', 'ta voorvoegsel', 'wat doet ta', 'wat betekent ta', 'letter ta',
+          'ta prefix', 'ti voorvoegsel', 'vrouwelijk', 'mannelijk', 'geslacht',
+          'feminine', 'masculine', 'gender', 'meervoud', 'plural', 'pluriel', 'femenino'],
+      nl: 'Zelfstandige naamwoorden in Tarifit werken met <strong>voorvoegsels</strong>:<br><br>' +
+          '<strong>a- / i-</strong> → mannelijk enkelvoud / meervoud<br>' +
+          '<span style="color:var(--cta)">a-dar</span> (voet) → <span style="color:var(--cta)">i-daren</span> (voeten)<br><br>' +
+          '<strong>ta- / ti-</strong> → vrouwelijk enkelvoud / meervoud<br>' +
+          '<span style="color:var(--cta)">ta-ddart</span> (huis) → <span style="color:var(--cta)">ti-ddarin</span> (huizen)<br><br>' +
+          'Het voorvoegsel <strong>ta-</strong> markeert vrouwelijke woorden. Dat is een van de meest herkenbare kenmerken van alle Berbertalen.',
+      en: 'Nouns in Tarifit work with <strong>prefixes</strong>:<br><br>' +
+          '<strong>a- / i-</strong> → masculine singular / plural<br>' +
+          '<span style="color:var(--cta)">a-dar</span> (foot) → <span style="color:var(--cta)">i-daren</span> (feet)<br><br>' +
+          '<strong>ta- / ti-</strong> → feminine singular / plural<br>' +
+          '<span style="color:var(--cta)">ta-ddart</span> (house) → <span style="color:var(--cta)">ti-ddarin</span> (houses)<br><br>' +
+          'The prefix <strong>ta-</strong> marks feminine nouns — one of the most recognisable features of all Berber languages.',
+      f: [['Hoe werken werkwoorden?', 'How do verbs work?'], ['Geef me familiewoorden', 'Give me family words']] },
+
+    { id: 'werkwoord',
+      k: ['werkwoord', 'vervoegen', 'vervoeging', 'conjugatie', 'verb', 'conjugate', 'conjugation',
+          'conjugaison', 'conjugar', 'hoe vervoeg ik'],
+      nl: 'Werkwoorden worden vervoegd met <strong>voor- en achtervoegsels</strong> rond de stam. Neem <strong>kkr</strong> (opstaan):<br><br>' +
+          '<span style="color:var(--cta)">kkr-egh</span> — ik sta op<br>' +
+          '<span style="color:var(--cta)">t-kkr-ed</span> — jij staat op<br>' +
+          '<span style="color:var(--cta)">i-kkr</span> — hij staat op<br>' +
+          '<span style="color:var(--cta)">t-kkr</span> — zij staat op<br><br>' +
+          'De stam blijft hetzelfde; wat ervoor en erachter komt vertelt wie er handelt. Herken je het patroon? De <strong>-egh</strong> aan het eind betekent "ik", en de <strong>t-</strong> vooraan hoort bij "jij" en "zij".',
+      en: 'Verbs are conjugated with <strong>prefixes and suffixes</strong> around the stem. Take <strong>kkr</strong> (to stand up):<br><br>' +
+          '<span style="color:var(--cta)">kkr-egh</span> — I stand up<br>' +
+          '<span style="color:var(--cta)">t-kkr-ed</span> — you stand up<br>' +
+          '<span style="color:var(--cta)">i-kkr</span> — he stands up<br>' +
+          '<span style="color:var(--cta)">t-kkr</span> — she stands up<br><br>' +
+          'The stem stays the same; what comes before and after tells you who is acting. Notice the pattern: <strong>-egh</strong> at the end means "I", and the <strong>t-</strong> at the front belongs to "you" and "she".',
+      f: [['Wat is het voorvoegsel ta-?', 'What is the ta- prefix?'], ['Geef me werkwoorden', 'Give me verbs']] },
+
+    { id: 'amazigh',
+      k: ['amazigh', 'wat betekent amazigh', 'berber', 'waarom geen berber', 'what does amazigh mean',
+          'why not berber', 'imazighen'],
+      nl: '"Amazigh" betekent letterlijk <strong>"vrije mens"</strong>. Het is de naam waarmee de volkeren van Noord-Afrika zichzelf aanduiden. Het meervoud is <strong>Imazighen</strong>.<br><br>"Berber" komt van een Grieks/Latijns woord voor "buitenlander" of "barbaar" en wordt daarom door veel Amazigh liever niet gebruikt.',
+      en: '"Amazigh" literally means <strong>"free person"</strong>. It is the name the peoples of North Africa use for themselves. The plural is <strong>Imazighen</strong>.<br><br>"Berber" comes from a Greek/Latin word for "foreigner" or "barbarian", which is why many Amazigh prefer not to use it.',
+      f: [['Wie zijn de Rifijnen?', 'Who are the Riffians?'], ['Wat is Tamazight?', 'What is Tamazight?']] },
+
+    { id: 'tamazight',
+      k: ['tamazight vs tarifit', 'verschil tamazight tarifit', 'wat is tamazight', 'wat is tarifit',
+          'difference tamazight tarifit', 'what is tamazight', 'what is tarifit', 'welke taal'],
+      nl: '<strong>Tamazight</strong> is de overkoepelende naam voor de Amazigh-talen van Marokko. <strong>Tarifit</strong> (of Rifi) is één variant daarvan, gesproken in het Rif-gebergte in het noorden.<br><br>Andere grote varianten zijn <strong>Tachelhit</strong> (zuidwesten) en <strong>Tamazight van de Midden-Atlas</strong>. Ze lijken op elkaar, maar sprekers verstaan elkaar niet altijd meteen — ongeveer zoals Nederlands en Duits.<br><br>Deze site leert je <strong>Tarifit</strong>.',
+      en: '<strong>Tamazight</strong> is the umbrella name for the Amazigh languages of Morocco. <strong>Tarifit</strong> (or Rifi) is one variant, spoken in the Rif mountains in the north.<br><br>Other major variants are <strong>Tachelhit</strong> (southwest) and <strong>Middle Atlas Tamazight</strong>. They are related, but speakers do not always understand each other immediately — roughly like Dutch and German.<br><br>This site teaches you <strong>Tarifit</strong>.',
+      f: [['Wat betekent Amazigh?', 'What does Amazigh mean?'], ['Wie zijn de Rifijnen?', 'Who are the Riffians?']] },
+
+    { id: 'erkenning',
+      k: ['wanneer erkend', 'officiele taal', 'sinds wanneer', 'ircam', 'erkenning', 'grondwet',
+          'when recognized', 'official language', 'recognition'],
+      nl: 'Tifinagh is sinds <strong>2003</strong> officieel erkend in Marokko en wordt sindsdien op scholen onderwezen. In <strong>2011</strong> werd Tamazight in de Marokkaanse grondwet opgenomen als officiële taal, naast het Arabisch.<br><br>Het schrift is gestandaardiseerd door het <strong>IRCAM</strong> (Institut Royal de la Culture Amazighe). Een belangrijk moment voor een taal die daarvoor decennialang werd weggedrukt.',
+      en: 'Tifinagh has been officially recognised in Morocco since <strong>2003</strong> and has been taught in schools ever since. In <strong>2011</strong> Tamazight was written into the Moroccan constitution as an official language alongside Arabic.<br><br>The script was standardised by <strong>IRCAM</strong> (Institut Royal de la Culture Amazighe). An important moment for a language that had been pushed aside for decades.',
+      f: [['Wat is Tifinagh?', 'What is Tifinagh?'], ['Wie zijn de Rifijnen?', 'Who are the Riffians?']] },
+
+    { id: 'rifijnen',
+      k: ['wie zijn de rifijnen', 'rifijnen', 'who are the riffians', 'riffians', 'rif volk', 'rifi'],
+      nl: 'De <strong>Rifijnen</strong> zijn de Amazigh-bevolking van het Rif-gebergte in Noord-Marokko. Ze spreken Tarifit en staan bekend om een lange geschiedenis van onafhankelijkheid — het ruige berglandschap hield veroveraars eeuwenlang op afstand.<br><br>Er woont ook een grote Rifijnse gemeenschap in Europa, met name in <strong>Nederland en België</strong>: veel Marokkaanse Nederlanders hebben hun wortels in het Rif.',
+      en: 'The <strong>Riffians</strong> are the Amazigh population of the Rif mountains in northern Morocco. They speak Tarifit and are known for a long history of independence — the rugged mountains kept conquerors at bay for centuries.<br><br>There is also a large Riffian community in Europe, especially in the <strong>Netherlands and Belgium</strong>: many Moroccan-Dutch people have their roots in the Rif.',
+      f: [['Wie was Abd el-Krim?', 'Who was Abd el-Krim?'], ['Wat was de Rif-oorlog?', 'What was the Rif War?']] },
+
+    { id: 'abdelkrim', person: true, birth: 1882, death: 1963,
+      name: { nl: 'Abd el-Krim al-Khattabi', en: 'Abd el-Krim al-Khattabi' },
+      k: ['abdelkrim', 'abd el krim', 'abd el-krim', 'khattabi', 'al khattabi', 'wie was abd'],
+      nl: '<strong>Abd el-Krim al-Khattabi</strong> (1882–1963) was een Rifijnse leider die in <strong>1921</strong> het Spaanse leger versloeg bij <strong>Annual</strong> — een van de zwaarste nederlagen van een Europese koloniale macht in Afrika.<br><br>Daarna riep hij de <strong>Republiek van de Rif</strong> uit, met Ajdir bij Al Hoceima als hoofdstad, compleet met eigen grondwet, parlement en munteenheid. In 1926 sloegen Spanje en Frankrijk samen terug; de republiek viel en Abd el-Krim ging in ballingschap.',
+      en: '<strong>Abd el-Krim al-Khattabi</strong> (1882–1963) was a Riffian leader who defeated the Spanish army at <strong>Annual</strong> in <strong>1921</strong> — one of the heaviest defeats of a European colonial power in Africa.<br><br>He then declared the <strong>Republic of the Rif</strong>, with Ajdir near Al Hoceima as its capital, complete with its own constitution, parliament and currency. In 1926 Spain and France struck back together; the republic fell and Abd el-Krim went into exile.',
+      f: [['Hoe oud is hij geworden?', 'How old was he when he died?'], ['Wat was de Rif-oorlog?', 'What was the Rif War?']] },
+
+    { id: 'rifoorlog',
+      k: ['rif oorlog', 'rifoorlog', 'rif war', 'annual', 'slag bij annual', 'battle of annual', 'guerra del rif'],
+      nl: 'De <strong>Rif-oorlog</strong> (1921–1926) was de strijd tussen Rifijnse stammen onder Abd el-Krim en de koloniale legers van Spanje, later ook Frankrijk.<br><br>In 1921 versloegen de Rifijnen het Spaanse leger bij <strong>Annual</strong>. Daarna volgde de Republiek van de Rif. In 1925–1926 sloegen Spanje en Frankrijk gezamenlijk terug met een grootschalig offensief, waarbij ook chemische wapens werden ingezet. De republiek viel in 1926.',
+      en: 'The <strong>Rif War</strong> (1921–1926) was the conflict between Riffian tribes under Abd el-Krim and the colonial armies of Spain, later joined by France.<br><br>In 1921 the Riffians defeated the Spanish army at <strong>Annual</strong>. The Republic of the Rif followed. In 1925–1926 Spain and France struck back together in a large-scale offensive in which chemical weapons were also used. The republic fell in 1926.',
+      f: [['Wie was Abd el-Krim?', 'Who was Abd el-Krim?'], ['Wat is de Republiek van de Rif?', 'What is the Republic of the Rif?']] },
+
+    { id: 'republiek',
+      k: ['republiek van de rif', 'republic of the rif', 'rif republiek', 'ajdir',
+          'hoofdstad van de rif', 'hoofdstad rif', 'capital of the rif', 'rif capital'],
+      nl: 'De <strong>Republiek van de Rif</strong> (1921–1926) was een kortstondige onafhankelijke staat, uitgeroepen door Abd el-Krim na de overwinning bij Annual.<br><br><strong>Ajdir</strong>, bij Al Hoceima, was de hoofdstad. De republiek had een eigen grondwet, parlement en munteenheid — uitzonderlijk voor een anti-koloniale beweging in die tijd. In 1926 viel ze onder een gezamenlijk Spaans-Frans offensief.',
+      en: 'The <strong>Republic of the Rif</strong> (1921–1926) was a short-lived independent state declared by Abd el-Krim after the victory at Annual.<br><br><strong>Ajdir</strong>, near Al Hoceima, was the capital. It had its own constitution, parliament and currency — exceptional for an anti-colonial movement at the time. It fell in 1926 under a joint Spanish-French offensive.',
+      f: [['Wie was Abd el-Krim?', 'Who was Abd el-Krim?'], ['Wat was de Rif-oorlog?', 'What was the Rif War?']] },
+
+    { id: 'nekor',
+      k: ['nekor', 'koninkrijk nekor', 'kingdom of nekor', 'salih ibn mansur', '710'],
+      nl: 'Het <strong>Koninkrijk Nekor</strong> werd volgens de overlevering rond <strong>710 n.Chr.</strong> gesticht door Salih ibn Mansur. Het was een van de eerste islamitische staten in het Rif-gebergte, en vanaf dat moment verspreidde de islam zich onder de Amazigh-bevolking van de regio.',
+      en: 'The <strong>Kingdom of Nekor</strong> was, according to tradition, founded around <strong>710 CE</strong> by Salih ibn Mansur. It was one of the first Islamic states in the Rif mountains, and from then on Islam spread among the Amazigh population of the region.',
+      f: [['Wie zijn de Rifijnen?', 'Who are the Riffians?'], ['Vertel over de geschiedenis', 'Tell me about the history']] },
+
+    { id: 'hirak',
+      k: ['hirak', 'mouhcine fikri', 'mohsine fikri', 'protest', 'demonstratie', '2016', '2017'],
+      nl: 'De <strong>Hirak al-Rif</strong>-beweging (2016–2017) ontstond na de dood van visverkoper <strong>Mouhcine Fikri</strong> in Al Hoceima. De protesten eisten banen, betere voorzieningen en meer investeringen in het Rif.<br><br>De beweging verspreidde zich naar andere Marokkaanse steden voordat ze in de zomer van 2017 hardhandig werd onderdrukt.',
+      en: 'The <strong>Hirak al-Rif</strong> movement (2016–2017) arose after the death of fish vendor <strong>Mouhcine Fikri</strong> in Al Hoceima. The protests demanded jobs, better services and more investment in the Rif.<br><br>The movement spread to other Moroccan cities before being forcefully suppressed in the summer of 2017.',
+      f: [['Wie zijn de Rifijnen?', 'Who are the Riffians?'], ['Vertel over de geschiedenis', 'Tell me about the history']] },
+
+    { id: 'chefchaouen',
+      k: ['chefchaouen', 'blauwe stad', 'blue city', 'chaouen'],
+      nl: '<strong>Chefchaouen</strong>, de bekende "blauwe stad" in het Rif-gebergte, werd in de <strong>15e eeuw</strong> mede gesticht door Andalusiërs die na de val van het moslimbewind in Spanje naar Noord-Afrika vluchtten. Zij brachten hun architectuur en muziek mee.',
+      en: '<strong>Chefchaouen</strong>, the famous "blue city" in the Rif mountains, was partly founded in the <strong>15th century</strong> by Andalusians who fled to North Africa after the fall of Muslim rule in Spain. They brought their architecture and music with them.',
+      f: [['Wie zijn de Rifijnen?', 'Who are the Riffians?'], ['Vertel over de geschiedenis', 'Tell me about the history']] },
+
+    { id: 'geschiedenis',
+      k: ['geschiedenis', 'history', 'histoire', 'historia', 'vertel over het rif', 'tijdlijn', 'timeline'],
+      nl: 'Het Rif is al meer dan tweeduizend jaar het thuisland van Amazigh-volkeren. Kort de grote momenten:<br><br>' +
+          '<strong>710</strong> — stichting van het Koninkrijk Nekor<br>' +
+          '<strong>15e eeuw</strong> — Andalusiërs vestigen zich in het Rif<br>' +
+          '<strong>1912</strong> — Spanje vestigt een protectoraat over Noord-Marokko<br>' +
+          '<strong>1921–1926</strong> — de Rif-oorlog en de Republiek van de Rif<br>' +
+          '<strong>1956</strong> — Marokko wordt onafhankelijk<br>' +
+          '<strong>2004</strong> — zware aardbeving bij Al Hoceima<br>' +
+          '<strong>2016–2017</strong> — de Hirak-beweging<br><br>' +
+          'Op de <strong>Uitleg</strong>-pagina staat de volledige tijdlijn.',
+      en: 'The Rif has been home to Amazigh peoples for over two thousand years. The main moments:<br><br>' +
+          '<strong>710</strong> — founding of the Kingdom of Nekor<br>' +
+          '<strong>15th c.</strong> — Andalusians settle in the Rif<br>' +
+          '<strong>1912</strong> — Spain establishes a protectorate over northern Morocco<br>' +
+          '<strong>1921–1926</strong> — the Rif War and the Republic of the Rif<br>' +
+          '<strong>1956</strong> — Morocco becomes independent<br>' +
+          '<strong>2004</strong> — major earthquake near Al Hoceima<br>' +
+          '<strong>2016–2017</strong> — the Hirak movement<br><br>' +
+          'The full timeline is on the <strong>Guide</strong> page.',
+      f: [['Wat was de Rif-oorlog?', 'What was the Rif War?'], ['Wie was Abd el-Krim?', 'Who was Abd el-Krim?']] },
+
+    { id: 'leren',
+      k: ['hoe begin ik', 'waar begin ik', 'tips', 'hoe leer ik', 'advies', 'beginner',
+          'how do i start', 'where do i start', 'how do i learn', 'advice', 'studietips'],
+      nl: 'Mijn advies, in deze volgorde:<br><br>' +
+          '<strong>1. Begin bij het alfabet.</strong> Leer eerst de 31 letters herkennen voordat je woorden leest.<br>' +
+          '<strong>2. Luister actief.</strong> Gebruik de spreekknop bij elke letter en elk woord — je oor went sneller dan je denkt.<br>' +
+          '<strong>3. Leer in categorieën.</strong> Begin met begroetingen en familiewoorden; die gebruik je het vaakst.<br>' +
+          '<strong>4. Oefen kort maar dagelijks.</strong> Vijf minuten per dag werkt beter dan één uur per week.<br>' +
+          '<strong>5. Praat met sprekers.</strong> Tarifit kent regionale verschillen — familie uit de Rif is je beste leraar.<br><br>' +
+          'Zeg <em>"overhoor me"</em> als je meteen wilt oefenen.',
+      en: 'My advice, in this order:<br><br>' +
+          '<strong>1. Start with the alphabet.</strong> Learn to recognise the 31 letters before you read words.<br>' +
+          '<strong>2. Listen actively.</strong> Use the speak button on every letter and word — your ear adapts faster than you think.<br>' +
+          '<strong>3. Learn by category.</strong> Start with greetings and family words; you will use those most.<br>' +
+          '<strong>4. Practise briefly but daily.</strong> Five minutes a day beats one hour a week.<br>' +
+          '<strong>5. Talk to speakers.</strong> Tarifit has regional variation — family from the Rif is your best teacher.<br><br>' +
+          'Say <em>"quiz me"</em> if you want to practise right now.',
+      f: [['Overhoor me', 'Quiz me'], ['Geef me begroetingen', 'Give me greetings']] },
+
+    { id: 'site',
+      k: ['wat kan deze site', 'wat is tifinaghhub', 'hoe werkt deze site', 'what is tifinaghhub',
+          'what can this site', 'how does this site work', 'xp', 'level', 'account'],
+      nl: 'Tifinaghhub is er om Tarifit en het Tifinagh-schrift laagdrempelig te leren. Wat je hier kunt:<br><br>' +
+          '<strong>Alfabet</strong> — de 31 letters herkennen en uitspreken<br>' +
+          '<strong>Woorden</strong> — door de woordenlijst bladeren met vertaling en uitspraak<br>' +
+          '<strong>Oefenen</strong> — quizvragen in meerkeuze- of vertaalvorm; elk goed antwoord geeft <strong>XP</strong> waarmee je levelt<br>' +
+          '<strong>Uitleg</strong> — schrift, klanken, grammatica, tips en de geschiedenis van het Rif<br>' +
+          '<strong>AI Coach</strong> — dat ben ik 🙂<br><br>Alles is gratis.',
+      en: 'Tifinaghhub exists to make Tarifit and the Tifinagh script easy to start learning. What you can do here:<br><br>' +
+          '<strong>Alphabet</strong> — recognise and pronounce the 31 letters<br>' +
+          '<strong>Words</strong> — browse the word list with translation and pronunciation<br>' +
+          '<strong>Practice</strong> — multiple-choice and translation quizzes; every correct answer gives <strong>XP</strong> so you level up<br>' +
+          '<strong>Guide</strong> — script, sounds, grammar, tips and the history of the Rif<br>' +
+          '<strong>AI Coach</strong> — that is me 🙂<br><br>Everything is free.',
+      f: [['Hoe begin ik?', 'How do I start?'], ['Overhoor me', 'Quiz me']] }
+  ];
+
+  /* ------------------------------------------------------- 7. KLETSPATRONEN */
+
+  var SMALL = [
+    { id: 'howareyou', re: /\b(alles goed|allesgoed|alles oke|alles okay|alles kits|alles chill|hoe gaat het|hoe gaat ie|hoe gaat t|hoe is het|hoe is ie|gaat het goed|hoe voel je|hoe gaat het ermee|how are you|how are things|hows it going|how is it going|whats up|what s up|you good|all good|you ok|ca va|comment vas tu|comment allez vous|tu vas bien|que tal|como estas|todo bien|labas|la bas)\b/ },
+    { id: 'greeting', re: /^(azul|hallo|hoi|hey|hee|hai|yo|hi|hello|goeiedag|goedemorgen|goedemiddag|goedenavond|salam|salaam|bonjour|salut|hola|buenas|good morning|good afternoon|good evening)\b/ },
+    { id: 'thanks', re: /\b(dank|dankje|dankjewel|dank je|dank u|bedankt|thanks|thank you|thx|merci|gracias|tanmirt|top|fijn zo|nice)\b/ },
+    { id: 'bye', re: /\b(doei|dag|tot ziens|tot later|later|bye|goodbye|see you|cya|beslama|au revoir|adios|hasta luego|ciao)\b/ },
+    { id: 'sorry', re: /\b(sorry|excuus|mijn fout|my bad|pardon|perdon|desole|lo siento)\b/ },
+    { id: 'praise', re: /\b(goed gedaan|netjes|mooi zo|top bot|je bent slim|goede bot|well done|nice one|good bot|youre smart|bien joue|muy bien)\b/ },
+    { id: 'whoareyou', re: /\b(wie ben je|wie ben jij|wat ben je|ben je een robot|ben je echt|who are you|what are you|are you a robot|are you real|qui es tu|quien eres)\b/ },
+    { id: 'whatcanyoudo', re: /\b(wat kun je|wat kan je|wat kun jij|waarmee kun je helpen|help me|hulp|wat moet ik vragen|what can you do|how can you help|can you help|que peux tu faire|que puedes hacer)\b/ },
+    { id: 'yes', re: /^(ja|jawel|yes|yep|yeah|ok|oke|okay|prima|graag|doe maar|zeker|oui|si|vale)$/ },
+    { id: 'no', re: /^(nee|nope|no|niet|non|nah)$/ },
+    { id: 'confused', re: /\b(snap het niet|begrijp het niet|wat bedoel je|ik snap je niet|dont understand|i dont get it|what do you mean|je ne comprends pas|no entiendo)\b/ },
+    { id: 'love', re: /\b(ik hou van je|i love you|je t aime|te quiero|leuke bot)\b/ }
+  ];
+
+  function smallReply(id) {
+    var l = L();
+    var hi = wordByNl('Hallo'), good = wordByNl('Goed'), bye = wordByNl('Doei'),
+        how = wordByNl('Hoe gaat het'), sorryW = wordByNl('Sorry');
+
+    switch (id) {
+      case 'howareyou':
+        return T('Mlih, tanmirt! 🙂 Met mij gaat het prima — ik heb de hele woordenlijst paraat. Waar wil jij mee aan de slag?',
+                 'Mlih, tanmirt! 🙂 I am doing fine — I have the whole word list ready. What would you like to work on?',
+                 'Mlih, tanmirt ! 🙂 Je vais bien — j\'ai toute la liste de mots sous la main. Sur quoi veux-tu travailler ?',
+                 '¡Mlih, tanmirt! 🙂 Estoy bien — tengo toda la lista de palabras lista. ¿Con qué quieres empezar?') +
+          (how ? '<br><br>' + T('Trouwens, zo vraag je dat in Tarifit:', 'By the way, this is how you ask that in Tarifit:',
+                                'Au fait, voici comment on le demande en tarifit :', 'Por cierto, así se pregunta en tarifit:') +
+                 card(how) + (good ? card(good) : '') : '');
+      case 'greeting':
+        return T('Azul! 👋 Fijn dat je er bent. Vraag me naar een woord, een letter, de grammatica of de geschiedenis van het Rif — of zeg <em>"overhoor me"</em> om te oefenen.',
+                 'Azul! 👋 Good to see you. Ask me about a word, a letter, the grammar or the history of the Rif — or say <em>"quiz me"</em> to practise.',
+                 'Azul ! 👋 Content de te voir. Demande-moi un mot, une lettre, la grammaire ou l\'histoire du Rif — ou dis <em>"quiz me"</em> pour t\'entraîner.',
+                 '¡Azul! 👋 Me alegra verte. Pregúntame por una palabra, una letra, la gramática o la historia del Rif — o di <em>"quiz me"</em> para practicar.') +
+          (hi ? card(hi) : '');
+      case 'thanks':
+        return T('Tanmirt — graag gedaan! 🙂 Nog iets anders dat je wilt weten?',
+                 'Tanmirt — you are welcome! 🙂 Anything else you would like to know?',
+                 'Tanmirt — de rien ! 🙂 Autre chose ?',
+                 'Tanmirt — ¡de nada! 🙂 ¿Algo más?');
+      case 'bye':
+        return T('Beslama! 👋 Kom gerust terug — vijf minuten per dag is genoeg om vooruit te gaan.',
+                 'Beslama! 👋 Come back any time — five minutes a day is enough to make progress.',
+                 'Beslama ! 👋 Reviens quand tu veux — cinq minutes par jour suffisent pour progresser.',
+                 '¡Beslama! 👋 Vuelve cuando quieras — cinco minutos al día bastan para avanzar.') +
+          (bye ? card(bye) : '');
+      case 'sorry':
+        return T('Geen probleem! 🙂 Waar waren we gebleven?', 'No problem at all! 🙂 Where were we?',
+                 'Pas de souci ! 🙂 Où en étions-nous ?', '¡Sin problema! 🙂 ¿Dónde estábamos?') +
+          (sorryW ? card(sorryW) : '');
+      case 'praise':
+        return T('Tanmirt! 😄 Zeg maar wat je nog meer wilt weten.', 'Tanmirt! 😄 Tell me what else you want to know.',
+                 'Tanmirt ! 😄 Dis-moi ce que tu veux savoir d\'autre.', '¡Tanmirt! 😄 Dime qué más quieres saber.');
+      case 'whoareyou':
+        return T('Ik ben de AI Coach van Tifinaghhub — een taalhulp die volledig in je browser draait, zonder internet. Ik ken alle ' + W.length + ' woorden en ' + (typeof ABC !== 'undefined' ? ABC.length : 31) + ' letters van deze site, plus de grammatica en de geschiedenis van het Rif.<br><br>Ik ben geen mens en geen groot taalmodel: ik verzin niets, ik werk met wat er in deze site staat. Weet ik iets niet, dan zeg ik dat eerlijk.',
+                 'I am the Tifinaghhub AI Coach — a language helper that runs entirely in your browser, without internet. I know all ' + W.length + ' words and ' + (typeof ABC !== 'undefined' ? ABC.length : 31) + ' letters on this site, plus the grammar and the history of the Rif.<br><br>I am not a human and not a large language model: I do not make things up, I work with what is in this site. If I do not know something, I say so.',
+                 'Je suis le coach IA de Tifinaghhub — une aide linguistique qui tourne entièrement dans ton navigateur, sans internet. Je connais les ' + W.length + ' mots et les lettres de ce site, ainsi que la grammaire et l\'histoire du Rif.<br><br>Je n\'invente rien : je travaille avec ce qui est sur ce site.',
+                 'Soy el coach de IA de Tifinaghhub — una ayuda lingüística que funciona por completo en tu navegador, sin internet. Conozco las ' + W.length + ' palabras y las letras de este sitio, además de la gramática y la historia del Rif.<br><br>No invento nada: trabajo con lo que hay en este sitio.');
+      case 'whatcanyoudo':
+        return helpHtml();
+      case 'yes':
+        return T('Mooi! Waar zullen we mee beginnen — een woord, een letter, grammatica, of zal ik je overhoren?',
+                 'Great! Where shall we start — a word, a letter, grammar, or shall I quiz you?',
+                 'Parfait ! On commence par quoi — un mot, une lettre, la grammaire, ou un quiz ?',
+                 '¡Genial! ¿Por dónde empezamos — una palabra, una letra, gramática, o te hago un test?') + sugChips();
+      case 'no':
+        return T('Prima. Zeg maar als je iets wilt opzoeken — ik sta klaar.',
+                 'That is fine. Just say the word when you want to look something up.',
+                 'Très bien. Dis-moi quand tu veux chercher quelque chose.',
+                 'Está bien. Dime cuando quieras buscar algo.');
+      case 'confused':
+        return T('Geen zorgen, ik leg het anders uit. Probeer bijvoorbeeld:<br>• <em>"wat is water in het Tarifit"</em><br>• <em>"hoe spreek ik ⵖ uit"</em><br>• <em>"leer me 5 familiewoorden"</em><br>• <em>"hoe werken werkwoorden"</em>',
+                 'No worries, let me put it differently. Try for example:<br>• <em>"what is water in Tarifit"</em><br>• <em>"how do I pronounce ⵖ"</em><br>• <em>"teach me 5 family words"</em><br>• <em>"how do verbs work"</em>',
+                 'Pas de souci. Essaie par exemple :<br>• <em>"comment dit-on eau en tarifit"</em><br>• <em>"comment prononcer ⵖ"</em><br>• <em>"apprends-moi 5 mots de famille"</em>',
+                 'Sin problema. Prueba por ejemplo:<br>• <em>"cómo se dice agua en tarifit"</em><br>• <em>"cómo pronuncio ⵖ"</em><br>• <em>"enséñame 5 palabras de familia"</em>');
+      case 'love':
+        return T('Dat is lief 😄 Ik help je graag verder met Tarifit. Wat wil je leren?',
+                 'That is kind of you 😄 Happy to keep helping you with Tarifit. What would you like to learn?',
+                 'C\'est gentil 😄 Je continue à t\'aider avec le tarifit. Que veux-tu apprendre ?',
+                 'Qué amable 😄 Sigo ayudándote con el tarifit. ¿Qué quieres aprender?');
+    }
+    return '';
+  }
+
+  function helpHtml() {
+    return T(
+      'Ik kan je met een hoop helpen. Een paar dingen die je kunt vragen:<br><br>' +
+      '<strong>Vertalen</strong> — <em>"wat is brood in het Tarifit"</em> · <em>"wat betekent aman"</em> · <em>"ⴰⵎⴰⵏ"</em><br>' +
+      '<strong>Hele zinnetjes</strong> — <em>"waar is het water"</em> (ik vertaal woord voor woord)<br>' +
+      '<strong>Letters</strong> — <em>"hoe spreek ik ⵖ uit"</em> · <em>"welke letter is ta"</em><br>' +
+      '<strong>Schrijven</strong> — <em>"schrijf azul in Tifinagh"</em><br>' +
+      '<strong>Woordgroepen</strong> — <em>"leer me 5 familiewoorden"</em> · <em>"woorden over eten"</em><br>' +
+      '<strong>Grammatica</strong> — <em>"hoe werken werkwoorden"</em> · <em>"wat doet ta-"</em><br>' +
+      '<strong>Geschiedenis</strong> — <em>"wie was Abd el-Krim"</em> · <em>"wat was de Rif-oorlog"</em><br>' +
+      '<strong>Oefenen</strong> — zeg <em>"overhoor me"</em> en ik stel je vragen<br><br>' +
+      'Vervolgvragen snap ik ook: vraag iets en zeg daarna <em>"en in Tifinagh?"</em> of <em>"hoe spreek je dat uit?"</em>',
+
+      'I can help with quite a lot. Some things you can ask:<br><br>' +
+      '<strong>Translate</strong> — <em>"what is bread in Tarifit"</em> · <em>"what does aman mean"</em> · <em>"ⴰⵎⴰⵏ"</em><br>' +
+      '<strong>Short sentences</strong> — <em>"where is the water"</em> (I translate word by word)<br>' +
+      '<strong>Letters</strong> — <em>"how do I pronounce ⵖ"</em> · <em>"which letter is ta"</em><br>' +
+      '<strong>Writing</strong> — <em>"write azul in Tifinagh"</em><br>' +
+      '<strong>Word groups</strong> — <em>"teach me 5 family words"</em> · <em>"words about food"</em><br>' +
+      '<strong>Grammar</strong> — <em>"how do verbs work"</em> · <em>"what does ta- do"</em><br>' +
+      '<strong>History</strong> — <em>"who was Abd el-Krim"</em> · <em>"what was the Rif War"</em><br>' +
+      '<strong>Practice</strong> — say <em>"quiz me"</em> and I will ask you questions<br><br>' +
+      'I follow up too: ask something, then say <em>"and in Tifinagh?"</em> or <em>"how is that pronounced?"</em>',
+
+      'Je peux t\'aider sur beaucoup de choses : traduire un mot, expliquer une lettre, écrire en tifinagh, donner des groupes de mots, expliquer la grammaire, raconter l\'histoire du Rif, ou te faire un quiz. Dis <em>"quiz me"</em> pour t\'entraîner.',
+      'Puedo ayudarte con mucho: traducir una palabra, explicar una letra, escribir en tifinagh, dar grupos de palabras, explicar gramática, contar la historia del Rif, o hacerte un test. Di <em>"quiz me"</em> para practicar.');
+  }
+
+  function sugChips() {
+    var s = L() === 'en'
+      ? ['Teach me 5 greetings', 'How do verbs work?', 'Quiz me', 'Who was Abd el-Krim?']
+      : ['Leer me 5 begroetingen', 'Hoe werken werkwoorden?', 'Overhoor me', 'Wie was Abd el-Krim?'];
+    return chips(s.map(function (x) { return [x, x]; }));
+  }
+  function chips(list) {
+    if (!list || !list.length) return '';
+    var l = L();
+    return '<div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem">' +
+      list.map(function (f) {
+        var t = (l === 'en' && f[1]) ? f[1] : f[0];
+        return '<button class="ai-sug" style="padding:.32rem .8rem;font-size:.76rem" onclick="aiAsk(\'' +
+          String(t).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\')">' + E(t) + '</button>';
+      }).join('') + '</div>';
+  }
+
+  function wordByNl(nl) {
+    var n = N(nl);
+    for (var i = 0; i < W.length; i++) if (N(W[i].nl) === n) return W[i];
+    return null;
+  }
+
+  /* ------------------------------------------------------- 8. WOORD ZOEKEN */
+  /* geeft gescoorde treffers terug: 1.0 = exact, lager = zwakker */
+
+  var FILLERS = [
+    /^(wat|wa) (is|zijn|betekent|betekend|beteken)\s+/, /^wat is het woord voor\s+/,
+    /^hoe (zeg|zegt|noem|noemt|schrijf|schrijft|spreek|spreekt) (je|jij|ik|u|men)\s+/,
+    /^hoe (zeg|noem|schrijf|spreek) ik\s+/, /^(vertaal|vertaling van|geef de vertaling van)\s+/,
+    /^wat (zeg|zegt) je (voor|tegen)\s+/, /^(kun|kan) je\s+/, /^(weet|ken) (je|jij)\s+/,
+    /^(zeg|noem|geef|toon|laat zien)\s+/, /\s+(in het|in de)\s+(tarifit|tamazight|tifinagh|berbers?|nederlands|engels)\b.*$/,
+    /\s+in\s+(tarifit|tamazight|tifinagh|berbers?|dutch|english)\b.*$/,
+    /^(what|whats) (is|are|does|do)\s+/, /^what is the word for\s+/,
+    /^how (do|does) (you|i|we) (say|write|pronounce|spell)\s+/, /^(translate|translation of)\s+/,
+    /\bmean(s|ing)?\s*$/, /^(the|a|an|het|de|een)\s+/, /\s+(alsjeblieft|please|aub)\s*$/
+  ];
+  function strip(q) {
+    var s = N(q), prev;
+    do { prev = s; FILLERS.forEach(function (p) { s = s.replace(p, ' ').trim(); }); }
+    while (s !== prev && s.length);
+    return s.trim();
+  }
+
+  function findWords(q, limit) {
+    var full = N(q), core = strip(q) || full;
+    var toks = TOK(core).filter(function (t) { return t.length > 1; });
+    var out = [];
+
+    W.forEach(function (w) {
+      var best = 0;
+      var all = w.keys.concat(w.tamKeys);
+
+      all.forEach(function (k) {
+        if (!k) return;
+        if (k === core || k === full) { best = Math.max(best, 1); return; }
+        if (core && k.length > 2 && (k === core)) { best = Math.max(best, 1); return; }
+        if (core && k.length > 2 && core.indexOf(k) === 0 &&
+            (core.length === k.length || core.charAt(k.length) === ' ')) best = Math.max(best, .82);
+        else if (core && k.length > 3 && (' ' + core + ' ').indexOf(' ' + k + ' ') >= 0) best = Math.max(best, .72);
+        else if (k.length > 3 && core && k.indexOf(core) === 0) best = Math.max(best, .7);
+        if (core && core.length > 3 && k.length > 3) {
+          var s = sim(core, k);
+          if (s > .78) best = Math.max(best, s * .9);
+        }
+      });
+
+      /* losse woorden uit de vraag */
+      if (best < .7 && toks.length) {
+        toks.forEach(function (t) {
+          all.forEach(function (k) {
+            if (!k || k.length < 2) return;
+            if (k === t) best = Math.max(best, .66);
+            else if (t.length > 3 && k.length > 3 && sim(t, k) > .84) best = Math.max(best, .55);
+          });
+        });
+      }
+
+      /* Tifinagh in de vraag */
+      if (TIF_RE.test(q)) {
+        var qq = q.replace(/\s+/g, '');
+        var tf = String(w.tif).replace(/\s+/g, '');
+        if (!tf) return;
+        if (qq.length === 1) { if (tf === qq) best = Math.max(best, .95); }
+        else if (tf === qq || tf.indexOf(qq) >= 0 || qq.indexOf(tf) >= 0) best = Math.max(best, .95);
+      }
+
+      if (best > 0) out.push({ w: w, s: best });
+    });
+
+    out.sort(function (a, b) { return b.s - a.s; });
+    return out.slice(0, limit || 8);
+  }
+
+  function findLetters(q) {
+    if (typeof ABC === 'undefined') return [];
+    var core = (strip(q) || N(q))
+      .replace(/\b(welke|welk|wat|is|de|het|een|letter|teken|symbool|klank|uit|spreek|hoe|ik|je|which|what|the|a|an|sound|pronounce|do|i|you|lettre|quelle|letra|cual)\b/g, ' ')
+      .replace(/\s+/g, ' ').trim();
+    var toks = TOK(core), out = [];
+    ABC.forEach(function (x) {
+      var s = 0;
+      if (q.indexOf(x.t) >= 0) s = 1;
+      else if (core === N(x.l)) s = .95;
+      else if (toks.indexOf(N(x.l)) >= 0 && N(x.l).length <= 2) s = .8;
+      else if (N(x.n).indexOf(core) >= 0 && core.length > 2) s = .85;
+      else if (core.length > 2 && sim(core, N(x.n).split(' ')[0]) > .85) s = .7;
+      if (s) out.push({ l: x, s: s });
+    });
+    out.sort(function (a, b) { return b.s - a.s; });
+    return out;
+  }
+
+  /* --------------------------------------------------------- 9. ANALYSATOREN */
+  /* Elke analysator geeft {score, html} of null. Hoogste score wint. */
+
+  function aQuizAnswer(q) {
+    if (!MEM.quiz) return null;
+    var nq = N(q);
+    if (/^(stop|klaar|genoeg|hou maar op|quit|stop quiz|enough|basta)$/.test(nq)) {
+      MEM.quiz = null;
+      return { score: 99, html: T('Oké, we stoppen met overhoren. 🙂 Zeg maar wanneer je verder wilt.',
+        'Alright, quiz over. 🙂 Tell me when you want to continue.',
+        'D\'accord, quiz terminé. 🙂', 'Vale, test terminado. 🙂') };
+    }
+    /* een echte vraag is geen antwoordpoging — laat de rest van de motor het doen,
+       de quizvraag blijft gewoon openstaan */
+    if (/\?/.test(q) || /^(wat|wie|waar|waarom|hoe|welke|welk|leg uit|vertel|geef|leer|what|who|where|why|how|which|explain|tell|give|teach)\b/.test(nq) || nq.length > 34) {
+      return null;
+    }
+
+    var qz = MEM.quiz;
+    var targets = qz.answer.split(/[/,]/).map(N).filter(Boolean);
+    var hit = targets.some(function (t) { return N(nq) === t || sim(nq, t) > .8; });
+
+    if (hit) {
+      var w = qz.word;
+      MEM.quiz = null;
+      var nxt = nextQuiz();
+      return { score: 99, html:
+        '<strong>' + T('Correct! 🎉', 'Correct! 🎉', 'Correct ! 🎉', '¡Correcto! 🎉') + '</strong><br>' +
+        card(w) + nxt };
+    }
+    qz.tries = (qz.tries || 0) + 1;
+    if (qz.tries >= 2) {
+      var w2 = qz.word; MEM.quiz = null;
+      return { score: 99, html:
+        T('Niet helemaal. Het juiste antwoord was:', 'Not quite. The correct answer was:',
+          'Pas tout à fait. La bonne réponse était :', 'No exactamente. La respuesta correcta era:') +
+        card(w2) + nextQuiz() };
+    }
+    var hintTxt = qz.answer.replace(/[^\s/]/g, function (c, i) { return i === 0 ? c : '·'; });
+    return { score: 99, html:
+      T('Nog niet. Probeer het nog een keer — een hintje: het begint met <strong>' + E(qz.answer.charAt(0)) + '</strong> (' + E(hintTxt) + ').',
+        'Not yet. Try once more — a hint: it starts with <strong>' + E(qz.answer.charAt(0)) + '</strong> (' + E(hintTxt) + ').',
+        'Pas encore. Essaie encore — indice : commence par <strong>' + E(qz.answer.charAt(0)) + '</strong>.',
+        'Todavía no. Inténtalo otra vez — pista: empieza por <strong>' + E(qz.answer.charAt(0)) + '</strong>.') };
+  }
+
+  function nextQuiz() {
+    var simple = W.filter(function (w) {
+      return String(w.tam).split('/')[0].trim().indexOf(' ') < 0;
+    });
+    var base = simple.length > 20 ? simple : W;
+    var pool = base.filter(function (w) { return !MEM.seen[w.i]; });
+    if (pool.length < 5) { MEM.seen = {}; pool = base; }
+    var w = pool[Math.floor(Math.random() * pool.length)];
+    MEM.seen[w.i] = 1;
+    MEM.quiz = { word: w, answer: String(w.tam).split('/')[0].trim(), tries: 0 };
+    return '<br>' + T('Volgende: hoe zeg je <strong>' + E(gloss(w)) + '</strong> in Tarifit?',
+      'Next: how do you say <strong>' + E(gloss(w)) + '</strong> in Tarifit?',
+      'Suivant : comment dit-on <strong>' + E(gloss(w)) + '</strong> en tarifit ?',
+      'Siguiente: ¿cómo se dice <strong>' + E(gloss(w)) + '</strong> en tarifit?') +
+      chips([['stop', 'stop']]);
+  }
+
+  function aQuizStart(q) {
+    var nq = N(q);
+    if (!/\b(overhoor|overhoren|quiz|test me|oefen met mij|oefenen met jou|vraag me|stel me vragen|examen|toets|quiz me|interrogation|preguntame)\b/.test(nq)) return null;
+    MEM.quiz = null;
+    return { score: 96, html:
+      T('Top — ik overhoor je. Typ het Tarifit-woord; zeg <em>"stop"</em> om te stoppen.',
+        'Great — let me quiz you. Type the Tarifit word; say <em>"stop"</em> to end.',
+        'Parfait — je t\'interroge. Tape le mot en tarifit ; dis <em>"stop"</em> pour arrêter.',
+        'Genial — te hago un test. Escribe la palabra en tarifit; di <em>"stop"</em> para parar.') + nextQuiz() };
+  }
+
+  function aSmalltalk(q) {
+    var nq = N(q);
+    for (var i = 0; i < SMALL.length; i++) {
+      if (SMALL[i].re.test(nq)) {
+        /* "hoe gaat het" is óók een woord in de lijst — kletsantwoord mag hier voorgaan */
+        MEM.topic = null;
+        return { score: 90, html: smallReply(SMALL[i].id) };
+      }
+    }
+    return null;
+  }
+
+  function aWriteInTifinagh(q) {
+    var nq = N(q);
+    if (!/\b(schrijf|spel|in tifinagh|naar tifinagh|write|spell|in tifinagh script|ecris|escribe)\b/.test(nq)) return null;
+    var core = N(q)
+      .replace(/\b(schrijf|spel|hoe|schrijf je|in|het|naar|tifinagh|script|write|spell|how|do|you|in|ecris|escribe|en)\b/g, ' ')
+      .replace(/\s+/g, ' ').trim();
+    if (!core) return null;
+
+    var hits = findWords(core, 1);
+    var html = '';
+    if (hits.length && hits[0].s > .7) {
+      var w = hits[0].w;
+      MEM.words = [w];
+      html = T('In Tifinagh schrijf je dat zo:', 'In Tifinagh you write that like this:',
+               'En tifinagh, cela s\'écrit :', 'En tifinagh se escribe así:') + card(w);
+      return { score: 88, html: html + chips(followFor(w)) };
+    }
+    /* niet in de lijst: letter voor letter omzetten, met duidelijke waarschuwing */
+    var out = '', unknown = 0;
+    core.split('').forEach(function (c) {
+      if (c === ' ') { out += ' '; return; }
+      if (LAT2TIF[c]) out += LAT2TIF[c]; else { out += c; unknown++; }
+    });
+    return { score: 80, html:
+      T('Dat woord staat niet in mijn woordenlijst, maar letter voor letter omgezet wordt het:',
+        'That word is not in my word list, but transliterated letter by letter it becomes:',
+        'Ce mot n\'est pas dans ma liste, mais translittéré lettre par lettre :',
+        'Esa palabra no está en mi lista, pero transliterada letra por letra queda:') +
+      '<div class="word-row"><span class="tifi">' + E(out) + '</span><span class="tam">' + E(core) + '</span></div>' +
+      (unknown ? '<span style="color:var(--muted);font-size:.82rem">' +
+        T('Let op: niet elke klank heeft een directe letter — dit is een benadering, geen correcte spelling.',
+          'Note: not every sound has a direct letter — this is an approximation, not correct spelling.',
+          'Note : ce n\'est qu\'une approximation.', 'Nota: es solo una aproximación.') + '</span>' : '') };
+  }
+
+  function aTifinaghInput(q) {
+    if (!TIF_RE.test(q)) return null;
+    var nTif = (String(q).match(/[\u2D30-\u2D7F]/g) || []).length;
+    var nLat = (String(q).match(/[a-z]/gi) || []).length;
+    /* 'ⵣ' of 'hoe spreek ik ⵣ uit' -> dat is een lettervraag, laat aLetter dat doen */
+    if (nTif === 1) return null;
+    if (nTif <= 2 && nLat > 0) return null;
+    var hits = findWords(q, 3);
+    if (hits.length && hits[0].s > .8) {
+      MEM.words = hits.map(function (h) { return h.w; });
+      return { score: 87, html:
+        T('Dat is:', 'That is:', 'C\'est :', 'Eso es:') +
+        hits.filter(function (h) { return h.s > .8; }).slice(0, 3).map(function (h) { return card(h.w); }).join('') +
+        chips(followFor(hits[0].w)) };
+    }
+    var lat = translit(q.replace(/\s+/g, ''));
+    var letters = q.split('').filter(function (c) { return TIF_RE.test(c); });
+    var rows = '';
+    if (typeof ABC !== 'undefined') {
+      var done = {};
+      letters.slice(0, 8).forEach(function (c) {
+        if (done[c]) return; done[c] = 1;
+        var m = ABC.filter(function (x) { return x.t === c; })[0];
+        if (m) rows += lcard(m);
+      });
+    }
+    return { score: 84, html:
+      T('Dat staat niet als woord in mijn lijst, maar letter voor letter lees je het als <strong>' + E(lat) + '</strong>.',
+        'That is not in my word list, but letter by letter it reads as <strong>' + E(lat) + '</strong>.',
+        'Ce n\'est pas dans ma liste, mais lettre par lettre cela se lit <strong>' + E(lat) + '</strong>.',
+        'No está en mi lista, pero letra por letra se lee <strong>' + E(lat) + '</strong>.') +
+      (rows ? '<br>' + rows : '') };
+  }
+
+  function aGroup(q) {
+    var nq = N(q);
+    var wantsList = /\b(leer me|leer mij|geef me|geef mij|noem|welke|lijst|woorden over|woordenschat|teach me|give me|list|words about|words for|vocab|apprends moi|donne moi|ensename|dame)\b/.test(nq);
+    var key = null, bestLen = 0;
+    Object.keys(GROUP_HINTS).forEach(function (k) {
+      GROUP_HINTS[k].forEach(function (h) {
+        if (nq.indexOf(h) >= 0 && h.length > bestLen) { key = k; bestLen = h.length; }
+      });
+    });
+    if (!key) return null;
+
+    /* "hoe werken werkwoorden" / "waarom ta-" is een uitlegvraag, geen woordenlijst */
+    var howQ = /^(hoe|waarom|how|why|comment|pourquoi|como|por que|wat doet|what does)\b/.test(nq) &&
+               !/\b(hoe zeg|hoe noem|hoe schrijf|how do you say|how do i say)\b/.test(nq);
+    if (howQ) return null;
+
+    /* losse groepsnaam telt ook als lijst-vraag: "familiewoorden", "de getallen" */
+    var bare = TOK(nq).length <= 3 && /(woorden|woordenschat|words|vocab|mots|palabras|getal|cijfer|number|nombre)/.test(nq);
+    if (!wantsList && !bare) return null;
+
+    var m = nq.match(/\b(\d+)\b/);
+    var n = m ? Math.min(parseInt(m[1], 10) || 5, 12) : 6;
+    var list = groupWords(key);
+    if (!list.length) return null;
+    var pick = list.slice(0, n);
+    MEM.words = pick;
+    MEM.topic = key;
+
+    return { score: 86, html:
+      T('Hier zijn ' + pick.length + ' woorden uit <strong>' + groupName(key) + '</strong>:',
+        'Here are ' + pick.length + ' words from <strong>' + groupName(key) + '</strong>:',
+        'Voici ' + pick.length + ' mots de <strong>' + groupName(key) + '</strong> :',
+        'Aquí tienes ' + pick.length + ' palabras de <strong>' + groupName(key) + '</strong>:') +
+      pick.map(card).join('') +
+      (list.length > pick.length ? '<span style="color:var(--muted);font-size:.82rem">' +
+        T('Er zijn er nog ' + (list.length - pick.length) + ' — vraag om meer.',
+          (list.length - pick.length) + ' more available — just ask.',
+          'Encore ' + (list.length - pick.length) + ' disponibles.',
+          'Hay ' + (list.length - pick.length) + ' más.') + '</span>' : '') +
+      chips([[T('Overhoor me', 'Quiz me'), 'Quiz me']]) };
+  }
+
+  function aKB(q) {
+    var nq = N(q), best = null, bestScore = 0;
+    KB.forEach(function (e) {
+      e.k.forEach(function (k) {
+        var kn = N(k), s = 0;
+        if (nq === kn) s = 1;
+        else if (nq.indexOf(kn) >= 0) s = .85 + Math.min(.1, kn.length / 200);
+        else if (kn.length > 5 && sim(nq, kn) > .8) s = .78;
+        else {
+          /* losse sleutelwoorden */
+          var kt = TOK(kn), qt = TOK(nq);
+          if (kt.length === 1 && kt[0].length > 4 && qt.indexOf(kt[0]) >= 0) s = .74;
+        }
+        if (s > bestScore) { bestScore = s; best = e; }
+      });
+    });
+    if (!best || bestScore < .7) return null;
+    MEM.topic = best.id;
+    if (best.person) MEM.person = best;
+    var body = (L() === 'nl') ? best.nl : best.en;
+    return { score: 60 + bestScore * 24, html: body + chips(best.f) };
+  }
+
+  var AGE = /\b(hoe oud|leeftijd|how old|quel age|que edad)\b/;
+  var BORN = /\b(geboren|geboortejaar|born|birth|ne en|nacio)\b/;
+  var DIED = /\b(overleden|gestorven|stierf|sterfjaar|died|death|mort|murio)\b/;
+
+  function aPersonFact(q) {
+    var nq = N(q);
+    if (!(AGE.test(nq) || BORN.test(nq) || DIED.test(nq))) return null;
+    var p = null;
+    KB.forEach(function (e) {
+      if (!e.person) return;
+      e.k.forEach(function (k) { if (nq.indexOf(N(k)) >= 0) p = e; });
+    });
+    if (!p && MEM.person && /\b(hij|hem|zijn|he|him|his|il|el)\b/.test(nq)) p = MEM.person;
+    if (!p) return null;
+    var name = L() === 'en' ? p.name.en : p.name.nl, msg;
+    if (AGE.test(nq)) {
+      var age = p.death - p.birth;
+      msg = T(name + ' werd <strong>' + age + ' jaar oud</strong> — geboren in ' + p.birth + ', overleden in ' + p.death + '.',
+              name + ' was <strong>' + age + ' years old</strong> when he died in ' + p.death + ' (born ' + p.birth + ').',
+              name + ' avait <strong>' + age + ' ans</strong> à sa mort en ' + p.death + '.',
+              name + ' tenía <strong>' + age + ' años</strong> cuando murió en ' + p.death + '.');
+    } else if (BORN.test(nq)) {
+      msg = T(name + ' werd geboren in <strong>' + p.birth + '</strong>.', name + ' was born in <strong>' + p.birth + '</strong>.',
+              name + ' est né en <strong>' + p.birth + '</strong>.', name + ' nació en <strong>' + p.birth + '</strong>.');
+    } else {
+      msg = T(name + ' overleed in <strong>' + p.death + '</strong>.', name + ' died in <strong>' + p.death + '</strong>.',
+              name + ' est mort en <strong>' + p.death + '</strong>.', name + ' murió en <strong>' + p.death + '</strong>.');
+    }
+    MEM.person = p;
+    return { score: 92, html: msg + chips(p.f) };
+  }
+
+  /* vervolgvragen die op het laatste antwoord slaan */
+  function aFollowUp(q) {
+    var nq = N(q);
+    var w = MEM.words && MEM.words.length ? MEM.words[0] : null;
+
+    if (/\b(en in tifinagh|in tifinagh|hoe schrijf je dat|hoe schrijf je die|schrijfwijze|and in tifinagh|how is that written|in tifinagh script)\b/.test(nq) && w) {
+      return { score: 85, html: T('In Tifinagh:', 'In Tifinagh:', 'En tifinagh :', 'En tifinagh:') + card(w) };
+    }
+    if (/\b(hoe spreek je dat uit|hoe klinkt dat|uitspraak daarvan|how is that pronounced|how does that sound|pronunciation of that)\b/.test(nq)) {
+      if (MEM.letter) return { score: 85, html: lcard(MEM.letter) };
+      if (w) {
+        var rows = '';
+        String(w.tif).split('').forEach(function (c) {
+          if (!TIF_RE.test(c) || !ABC) return;
+          var m = ABC.filter(function (x) { return x.t === c; })[0];
+          if (m && rows.indexOf(m.t) < 0) rows += lcard(m);
+        });
+        return { score: 85, html:
+          T('<strong>' + E(w.tam) + '</strong> — klank voor klank:', '<strong>' + E(w.tam) + '</strong> — sound by sound:',
+            '<strong>' + E(w.tam) + '</strong> — son par son :', '<strong>' + E(w.tam) + '</strong> — sonido a sonido:') +
+          (rows || card(w)) +
+          '<br><span style="color:var(--muted);font-size:.82rem">' +
+          T('Tip: op de Woorden-pagina staat een spreekknop bij elk woord.',
+            'Tip: the Words page has a speak button for every word.',
+            'Astuce : la page Mots a un bouton pour écouter.', 'Consejo: la página Palabras tiene un botón para escuchar.') + '</span>' };
+      }
+    }
+    if (/\b(nog een|nog meer|meer daarvan|meer woorden|another|more of those|more words|encore|mas)\b/.test(nq) && MEM.topic && GROUPS[MEM.topic]) {
+      var list = groupWords(MEM.topic);
+      var have = (MEM.words || []).map(function (x) { return x.i; });
+      var rest = list.filter(function (x) { return have.indexOf(x.i) < 0; }).slice(0, 6);
+      if (rest.length) {
+        MEM.words = (MEM.words || []).concat(rest);
+        return { score: 85, html: T('Nog een paar uit <strong>' + groupName(MEM.topic) + '</strong>:',
+          'A few more from <strong>' + groupName(MEM.topic) + '</strong>:',
+          'Encore quelques-uns :', 'Algunas más:') + rest.map(card).join('') };
+      }
+    }
+    if (/\b(leg uit|waarom|vertel meer|meer info|explain|why|tell me more|more about that|pourquoi|por que)\b/.test(nq) && MEM.topic) {
+      var e = KB.filter(function (x) { return x.id === MEM.topic; })[0];
+      if (e) return { score: 83, html: (L() === 'nl' ? e.nl : e.en) + chips(e.f) };
+    }
+    return null;
+  }
+
+  function aLetter(q) {
+    var hits = findLetters(q);
+    if (!hits.length) return null;
+    var nq = N(q);
+    var asksLetter = /\b(letter|teken|symbool|klank|uitspraak|spreek|klinkt|alfabet|character|symbol|sound|pronounce|sounds|alphabet|lettre|prononc|letra|sonido)\b/.test(nq) || TIF_RE.test(q);
+    var top = hits[0];
+    if (top.s < .8 && !asksLetter) return null;
+    MEM.letter = top.l;
+    var show = hits.filter(function (h) { return h.s >= Math.max(.7, top.s - .1); }).slice(0, 3);
+    var l = L();
+    var ex = l === 'en' ? (top.l.ex_en || top.l.ex) : top.l.ex;
+    return { score: asksLetter ? 82 : 70 + top.s * 8, html:
+      T('Letter ' + (show.length > 1 ? 's' : '') + ' in het alfabet:', 'Letter' + (show.length > 1 ? 's' : '') + ' in the alphabet:',
+        'Lettre' + (show.length > 1 ? 's' : '') + ' de l\'alphabet :', 'Letra' + (show.length > 1 ? 's' : '') + ' del alfabeto:') +
+      show.map(function (h) { return lcard(h.l); }).join('') +
+      (ex ? '<br>' + T('Voorbeeld: ', 'Example: ', 'Exemple : ', 'Ejemplo: ') + '<span class="tifi" style="font-size:1rem">' + E(ex) + '</span>' : '') +
+      chips([[T('Hoe werkt het alfabet?', 'How does the alphabet work?'), 'How does the alphabet work?'],
+             [T('Welke klanken zijn moeilijk?', 'Which sounds are difficult?'), 'Which sounds are difficult?']]) };
+  }
+
+  function aLetterUnknown(q) {
+    var nq = N(q);
+    if (!/\b(letter|teken|symbool|character|symbol|lettre|letra)\b/.test(nq)) return null;
+    if (findLetters(q).length) return null;
+    var extra = /\bta\b|\bti\b/.test(nq)
+      ? '<br><br>' + T('Bedoel je misschien het voorvoegsel <strong>ta-</strong>? Dat is geen letter maar een voorvoegsel dat vrouwelijke woorden markeert — vraag me <em>"wat doet ta-"</em>.',
+                       'Do you perhaps mean the prefix <strong>ta-</strong>? That is not a letter but a prefix marking feminine nouns — ask me <em>"what does ta- do"</em>.',
+                       'Tu parles peut-être du préfixe <strong>ta-</strong> ? Ce n\'est pas une lettre mais un préfixe du féminin.',
+                       '¿Te refieres al prefijo <strong>ta-</strong>? No es una letra sino un prefijo de femenino.')
+      : '';
+    return { score: 40, html:
+      T('Die letter herken ik niet. Elke Tifinagh-letter staat voor één klank — je kunt me naar een letter vragen met het teken zelf (<em>"hoe spreek ik ⵖ uit"</em>) of met de Latijnse klank (<em>"welke letter is gh"</em>).',
+        'I do not recognise that letter. Every Tifinagh letter stands for one sound — you can ask me with the symbol itself (<em>"how do I pronounce ⵖ"</em>) or with the Latin sound (<em>"which letter is gh"</em>).',
+        'Je ne reconnais pas cette lettre. Demande-moi avec le symbole (<em>"comment prononcer ⵖ"</em>) ou avec le son latin.',
+        'No reconozco esa letra. Pregúntame con el símbolo (<em>"cómo pronuncio ⵖ"</em>) o con el sonido latino.') +
+      extra +
+      '<br><br>' + T('Alle 31 letters staan op de <strong>Alfabet</strong>-pagina.',
+                     'All 31 letters are on the <strong>Alphabet</strong> page.',
+                     'Les 31 lettres sont sur la page <strong>Alphabet</strong>.',
+                     'Las 31 letras están en la página <strong>Alfabeto</strong>.') };
+  }
+
+  function followFor(w) {
+    return [[T('Hoe spreek je dat uit?', 'How is that pronounced?'), 'How is that pronounced?'],
+            [T('Overhoor me', 'Quiz me'), 'Quiz me']];
+  }
+
+  function aWord(q) {
+    var hits = findWords(q, 8);
+    if (!hits.length) return null;
+    var top = hits[0];
+    if (top.s < .5) return null;
+    var strong = hits.filter(function (h) { return h.s >= Math.max(.62, top.s - .14); }).slice(0, 5);
+    MEM.words = strong.map(function (h) { return h.w; });
+    MEM.topic = null;
+
+    var head;
+    if (top.s >= .95) head = T('Dat is:', 'That is:', 'C\'est :', 'Eso es:');
+    else if (strong.length === 1) head = T('Dit vond ik:', 'Here is what I found:', 'Voici ce que j\'ai trouvé :', 'Esto encontré:');
+    else head = T('Ik vond <strong>' + strong.length + '</strong> woorden:', 'I found <strong>' + strong.length + '</strong> words:',
+                  'J\'ai trouvé <strong>' + strong.length + '</strong> mots :', 'Encontré <strong>' + strong.length + '</strong> palabras:');
+    if (top.s < .7) head = T('Ik weet het niet zeker — bedoelde je misschien:', 'I am not certain — did you mean:',
+                             'Je ne suis pas sûr — voulais-tu dire :', 'No estoy seguro — ¿querías decir:');
+
+    return { score: 40 + top.s * 42,
+      html: head + strong.map(function (h) { return card(h.w); }).join('') + chips(followFor(top.w)) };
+  }
+
+  /* zin vertalen: woord voor woord met wat er bekend is */
+  function aSentence(q) {
+    var core = strip(q) || N(q);
+    var toks = TOK(core).filter(function (t) { return t.length > 1; });
+    if (toks.length < 2) return null;
+
+    var parts = [], known = 0;
+    toks.forEach(function (t) {
+      var best = null, bs = 0;
+      W.forEach(function (w) {
+        w.keys.concat(w.tamKeys).forEach(function (k) {
+          if (!k) return;
+          var s = (k === t) ? 1 : (t.length > 3 && k.length > 3 && sim(t, k) > .85 ? .8 : 0);
+          if (s > bs) { bs = s; best = w; }
+        });
+      });
+      if (best && bs >= .8) { known++; parts.push({ t: t, w: best }); }
+      else parts.push({ t: t, w: null });
+    });
+
+    if (known < 2 || known / toks.length < .5) return null;
+
+    var line = parts.map(function (p) {
+      return p.w ? String(p.w.tam).split('/')[0].trim() : '…';
+    }).join(' ');
+    var tif = parts.map(function (p) {
+      return p.w ? String(p.w.tif).split('/')[0].trim() : '…';
+    }).join(' ');
+    var missing = parts.filter(function (p) { return !p.w; }).map(function (p) { return p.t; });
+
+    MEM.words = parts.filter(function (p) { return p.w; }).map(function (p) { return p.w; });
+
+    var sScore = (toks.length >= 3 && known >= 2) ? 76 : 62;
+    return { score: sScore, html:
+      T('Woord voor woord kom ik hierop uit:', 'Word by word, this is what I get:',
+        'Mot à mot, j\'obtiens :', 'Palabra por palabra, obtengo:') +
+      '<div class="word-row"><span class="tifi">' + E(tif) + '</span><span class="tam">' + E(line) + '</span></div>' +
+      parts.filter(function (p) { return p.w; }).map(function (p) { return card(p.w); }).join('') +
+      '<span style="color:var(--muted);font-size:.82rem">' +
+      (missing.length
+        ? T('Deze woorden ken ik niet: <strong>' + E(missing.join(', ')) + '</strong>. ', 'I do not know these words: <strong>' + E(missing.join(', ')) + '</strong>. ',
+            'Je ne connais pas : <strong>' + E(missing.join(', ')) + '</strong>. ', 'No conozco: <strong>' + E(missing.join(', ')) + '</strong>. ')
+        : '') +
+      T('Let op: dit is een letterlijke vertaling per woord. Tarifit heeft een eigen zinsbouw, dus een echte spreker zou dit anders zeggen.',
+        'Note: this is a literal word-for-word translation. Tarifit has its own sentence structure, so a real speaker would phrase it differently.',
+        'Note : traduction littérale mot à mot. Le tarifit a sa propre syntaxe.',
+        'Nota: traducción literal palabra por palabra. El tarifit tiene su propia sintaxis.') + '</span>' };
+  }
+
+  function aFallback(q) {
+    var hits = findWords(q, 4).filter(function (h) { return h.s > .35; });
+    var sug = hits.length
+      ? T('Bedoelde je misschien een van deze?', 'Did you perhaps mean one of these?',
+          'Voulais-tu dire l\'un de ceux-ci ?', '¿Quizá querías decir uno de estos?') +
+        hits.slice(0, 3).map(function (h) { return card(h.w); }).join('')
+      : '';
+    return { score: 1, html:
+      T('Dat staat niet in mijn woordenlijst — ik werk met de ' + W.length + ' woorden die op deze site staan, en ik verzin liever niets.',
+        'That is not in my word list — I work with the ' + W.length + ' words on this site, and I would rather not invent anything.',
+        'Ce n\'est pas dans ma liste — je travaille avec les ' + W.length + ' mots de ce site et je préfère ne rien inventer.',
+        'No está en mi lista — trabajo con las ' + W.length + ' palabras de este sitio y prefiero no inventar nada.') +
+      (sug ? '<br><br>' + sug : '') +
+      '<br><br>' + T('Je kunt het woord laten toevoegen met de knop <strong>\'Woord voorstellen\'</strong> onderaan de site. Of probeer iets anders:',
+        'You can have the word added with the <strong>\'Suggest a word\'</strong> button at the bottom of the site. Or try something else:',
+        'Tu peux proposer le mot avec le bouton <strong>\'Proposer un mot\'</strong> en bas du site.',
+        'Puedes proponer la palabra con el botón <strong>\'Sugerir una palabra\'</strong> al final del sitio.') +
+      sugChips() };
+  }
+
+  /* ----------------------------------------------------------- 10. MOTOR */
+
+  var ANALYZERS = [aQuizAnswer, aQuizStart, aSmalltalk, aPersonFact, aFollowUp,
+                   aWriteInTifinagh, aTifinaghInput, aGroup, aKB, aLetter, aLetterUnknown,
+                   aWord, aSentence];
+
+  /* Analysatoren schrijven in MEM. Alleen de winnaar mag dat echt doen, anders
+     laat een verliezende analysator sporen na en slaat een vervolgvraag de plank mis. */
+  function snap() {
+    var seen = {}, k;
+    for (k in MEM.seen) if (Object.prototype.hasOwnProperty.call(MEM.seen, k)) seen[k] = MEM.seen[k];
+    return {
+      words: (MEM.words || []).slice(), letter: MEM.letter, topic: MEM.topic, person: MEM.person,
+      quiz: MEM.quiz ? { word: MEM.quiz.word, answer: MEM.quiz.answer, tries: MEM.quiz.tries } : null,
+      seen: seen
+    };
+  }
+  function restore(s) {
+    var seen = {}, k;
+    for (k in s.seen) if (Object.prototype.hasOwnProperty.call(s.seen, k)) seen[k] = s.seen[k];
+    MEM = { words: s.words.slice(), letter: s.letter, topic: s.topic, person: s.person,
+            quiz: s.quiz ? { word: s.quiz.word, answer: s.quiz.answer, tries: s.quiz.tries } : null,
+            seen: seen };
+  }
+
+  function think(q) {
+    var s0 = snap(), bestIdx = -1, bestScore = -1, i, r;
+    for (i = 0; i < ANALYZERS.length; i++) {
+      restore(s0);
+      r = null;
+      try { r = ANALYZERS[i](q); } catch (e) { r = null; }
+      if (r && r.html && r.score > bestScore) { bestScore = r.score; bestIdx = i; }
+    }
+    restore(s0);
+    if (bestIdx < 0) return aFallback(q);
+    try { r = ANALYZERS[bestIdx](q); } catch (e) { r = null; }
+    return (r && r.html) ? r : aFallback(q);
+  }
+
+  /* delay oogt natuurlijker als hij meebeweegt met de lengte van het antwoord */
+  function delayFor(html) {
+    return Math.min(1100, 320 + String(html).length / 6);
+  }
+
+  window.aiAnswer = function (q) {
+    var res;
+    try { res = think(q); }
+    catch (e) {
+      res = { html: T('Daar ging bij mij iets mis. Probeer het anders te formuleren.',
+                      'Something went wrong on my side. Try phrasing it differently.',
+                      'Un problème est survenu. Reformule ta question.',
+                      'Algo salió mal. Intenta reformularlo.') };
+    }
+    setTimeout(function () {
+      if (typeof aiRemoveTyping === 'function') aiRemoveTyping();
+      if (typeof aiAddMsg === 'function') aiAddMsg('bot', res.html);
+    }, delayFor(res.html));
+  };
+
+  /* geheugen leegmaken bij een nieuw gesprek */
+  var _new = window.aiNewChat;
+  if (typeof _new === 'function') {
+    window.aiNewChat = function () {
+      MEM = { words: [], letter: null, topic: null, person: null, quiz: null, seen: {} };
+      return _new.apply(this, arguments);
+    };
+  }
+
+  window.TFH_BRAIN = { think: think, mem: function () { return MEM; }, words: W };
+})();
+
+</script>
 </body>
 </html>
